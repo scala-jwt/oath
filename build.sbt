@@ -1,12 +1,12 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalaVersion := "2.13.10"
-ThisBuild / organization := "io.github.andrewrigas"
+ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
-ThisBuild / organizationHomepage := Some(url("https://github.com/andrewrigas/oath"))
+ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 ThisBuild / coverageEnabled := true
-ThisBuild / tlBaseVersion := "2.0"
+ThisBuild / tlBaseVersion := "0.0"
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
   tlGitHubDev("andrewrigas", "Andreas Rigas")

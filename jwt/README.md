@@ -1,6 +1,6 @@
-[![Build status](https://img.shields.io/github/workflow/status/andrewrigas/oath/Continuous%20Integration.svg)](https://github.com/andrewrigas/oath/actions)
-[![Coverage status](https://img.shields.io/codecov/c/github/andrewrigas/oath/master.svg)](https://codecov.io/github/andrewrigas/oath)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.andrewrigas/jwt-core_2.13.svg)](https://central.sonatype.dev/artifact/io.github.andrewrigas/jwt-core_2.13/0.0.6)
+[![Build status](https://img.shields.io/github/workflow/status/scala-jwt/oath/Continuous%20Integration.svg)](https://github.com/scala-jwt/oath/actions)
+[![Coverage status](https://img.shields.io/codecov/c/github/scala-jwt/oath/master.svg)](https://codecov.io/github/scala-jwt/oath)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.scala-jwt/jwt-core_2.13.svg)](https://central.sonatype.dev/artifact/io.github.scala-jwt/jwt-core_2.13/0.0.6)
 
 # JWT (JSON Web Token)
 
@@ -13,24 +13,24 @@ if you have already used those libraries you would probably find your self famil
 
 ## SBT Dependencies
 
-* [jwt-core](https://mvnrepository.com/artifact/io.github.andrewrigas/jwt-core)
+* [jwt-core](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-core)
 
 ```scala
-libraryDependencies += "io.github.andrewrigas" %% "jwt-core" % "0.0.0"
+libraryDependencies += "io.github.scala-jwt" %% "jwt-core" % "0.0.0"
 ```
 
 ### Json Converters
 
-* [jwt-circe](https://mvnrepository.com/artifact/io.github.andrewrigas/jwt-circe)
+* [jwt-circe](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-circe)
 
 ```scala
-libraryDependencies += "io.github.andrewrigas" %% "jwt-circe" % "0.0.0"
+libraryDependencies += "io.github.scala-jwt" %% "jwt-circe" % "0.0.0"
 ```
 
-* [jwt-jsoniter-scala](https://mvnrepository.com/artifact/io.github.andrewrigas/jwt-jsoniter-scala)
+* [jwt-jsoniter-scala](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-jsoniter-scala)
 
 ```scala
-libraryDependencies += "io.github.andrewrigas" %% "jwt-jsoniter-scala" % "0.0.0"
+libraryDependencies += "io.github.scala-jwt" %% "jwt-jsoniter-scala" % "0.0.0"
 ```
 
 ---
