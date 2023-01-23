@@ -75,13 +75,12 @@ trait Arbitraries {
       audienceClaims      <- Gen.listOf(genNonEmptyString.arbitrary)
       includeJwtIdClaim   <- Arbitrary.arbitrary[Boolean]
       includeIssueAtClaim <- Arbitrary.arbitrary[Boolean]
-      expiresAtOffset     <- Gen.option(genPositiveFiniteDuration)
-      notBeforeOffset     <- Gen.option(genPositiveFiniteDuration)
+      expiresAtOffset     <- Gen.option(genPositiveFiniteDurationSeconds)
+      notBeforeOffset     <- Gen.option(genPositiveFiniteDurationSeconds)
       leeway              <- Gen.option(genPositiveFiniteDurationSeconds)
       issuedAt            <- Gen.option(genPositiveFiniteDurationSeconds)
       expiresAt           <- Gen.option(genPositiveFiniteDurationSeconds)
-      notBefore           <- Gen.option(genPositiveFiniteDurationSeconds)
-      leewayWindow = LeewayWindowConfig(leeway, issuedAt, expiresAt, notBefore)
+      leewayWindow = LeewayWindowConfig(leeway, issuedAt, expiresAt, notBeforeOffset.map(_.plus(1.second)))
       providedWith = ProvidedWithConfig(issuerClaim, subjectClaim, audienceClaims)
       encrypt      = encryptKey.map(EncryptConfig)
       registered = RegisteredConfig(issuerClaim,

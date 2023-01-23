@@ -32,7 +32,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
     "issue jwt tokens" when {
 
       "issue token with predefine configure claims" in forAll { config: JwtIssuerConfig =>
-        val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), clock)
+        val now       = getInstantNowSeconds
+        val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt().value
 
         val decodedJWT = jwtVerifier.verify(jwtClaims.token.value)
@@ -61,7 +62,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
       "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
-          val jwtIssuer = new JwtIssuer(config, clock)
+          val now       = getInstantNowSeconds
+          val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
           val jwtClaims = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
           val expectedIssuer  = registeredClaims.iss orElse config.registered.issuerClaim
@@ -92,9 +94,10 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
       "issue token with registered claims when decoded should have the same values with the return registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
+          val now = getInstantNowSeconds
           val adHocRegisteredClaims =
             registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
-          val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), clock)
+          val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
           val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
           val decodedJWT = jwtVerifier.verify(jwtClaims.token.value)
@@ -115,6 +118,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       "issue token with only registered claims encrypted" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           whenever(config.encrypt.nonEmpty) {
+            val clock     = getFixedClock(getInstantNowSeconds)
             val jwtIssuer = new JwtIssuer(config, clock)
             val jwt       = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
