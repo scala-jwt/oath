@@ -58,14 +58,14 @@ values, therefore the library doesn't enforce you to use them.
 
 ```scala
 final case class RegisteredClaims(
-                                   iss: Option[NonEmptyString] = None,
-                                   sub: Option[NonEmptyString] = None,
-                                   aud: Seq[NonEmptyString] = Seq.empty,
-                                   exp: Option[Instant] = None,
-                                   nbf: Option[Instant] = None,
-                                   iat: Option[Instant] = None,
-                                   jti: Option[NonEmptyString] = None
-                                 )
+    iss: Option[NonEmptyString] = None,
+    sub: Option[NonEmptyString] = None,
+    aud: Seq[NonEmptyString] = Seq.empty,
+    exp: Option[Instant] = None,
+    nbf: Option[Instant] = None,
+    iat: Option[Instant] = None,
+    jti: Option[NonEmptyString] = None
+)
 ```
 
 Claims is more than Registered Claims though. Therefore, if the business requirements requires extra claims to be able
