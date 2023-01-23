@@ -26,6 +26,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
                       LeewayWindowConfig(None, None, None, None))
 
   def setRegisteredClaims(builder: JWTCreator.Builder, config: JwtVerifierConfig): TestData = {
+    val now       = getInstantNowSeconds
     val leeway    = config.leewayWindow.leeway.map(leeway => now.plusSeconds(leeway.toSeconds - 1))
     val expiresAt = config.leewayWindow.expiresAt.map(expiresAt => now.plusSeconds(expiresAt.toSeconds - 1))
     val notBefore = config.leewayWindow.notBefore.map(notBefore => now.plusSeconds(notBefore.toSeconds - 1))
@@ -346,7 +347,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     "fail to verify token with TokenExpired when JWT expires" in {
       val jwtVerifier = new JwtVerifier(defaultConfig)
 
-      val expiresAt = now.minusSeconds(1)
+      val expiresAt = getInstantNowSeconds.minusSeconds(1)
       val token = JWT
         .create()
         .withExpiresAt(expiresAt)
