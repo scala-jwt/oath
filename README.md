@@ -2,7 +2,7 @@
 [![Coverage status](https://img.shields.io/codecov/c/github/scala-jwt/oath/master.svg)](https://codecov.io/github/scala-jwt/oath)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.scala-jwt/jwt-core_2.13.svg)](https://central.sonatype.dev/artifact/io.github.scala-jwt/jwt-core_2.13/0.0.6)
 
-## OATH
+## Scala JWT - OATH
 
 __OATH__ provides a set of tools for WEB Applications 
 1. CSRF token generation 
