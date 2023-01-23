@@ -32,6 +32,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
     "issue jwt tokens" when {
 
       "issue token with predefine configure claims" in forAll { config: JwtIssuerConfig =>
+        val (time, clock) = timeWithClock
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), clock)
         val jwtClaims = jwtIssuer.issueJwt().value
 
@@ -45,7 +46,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           .flatten
           .flatMap(NonEmptyString.unapply) shouldBe config.registered.audienceClaims
 
-        Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe Option.when(config.registered.includeIssueAtClaim)(now)
+        Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe Option.when(config.registered.includeIssueAtClaim)(time)
 
         if (config.registered.includeJwtIdClaim)
           Option(decodedJWT.getId) should not be empty
@@ -53,14 +54,15 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           Option(decodedJWT.getId) shouldBe empty
 
         Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe config.registered.expiresAtOffset.map(offset =>
-          now.plusSeconds(offset.toSeconds))
+          time.plusSeconds(offset.toSeconds))
 
         Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe config.registered.notBeforeOffset.map(offset =>
-          now.plusSeconds(offset.toSeconds))
+          time.plusSeconds(offset.toSeconds))
       }
 
       "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
+          val (time, clock) = timeWithClock
           val jwtIssuer = new JwtIssuer(config, clock)
           val jwtClaims = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
@@ -68,13 +70,13 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val expectedSubject = registeredClaims.sub orElse config.registered.subjectClaim
           val expectedAudience =
             if (registeredClaims.aud.nonEmpty) registeredClaims.aud else config.registered.audienceClaims
-          val expectedIssuedAt = registeredClaims.iat orElse Option.when(config.registered.includeIssueAtClaim)(now)
+          val expectedIssuedAt = registeredClaims.iat orElse Option.when(config.registered.includeIssueAtClaim)(time)
           val expectedExpiredAt =
             registeredClaims.exp orElse config.registered.expiresAtOffset.map(offset =>
-              now.plusSeconds(offset.toSeconds))
+              time.plusSeconds(offset.toSeconds))
           val expectedNotBefore =
             registeredClaims.nbf orElse config.registered.notBeforeOffset.map(offset =>
-              now.plusSeconds(offset.toSeconds))
+              time.plusSeconds(offset.toSeconds))
 
           jwtClaims.claims.registered.iss shouldBe expectedIssuer
           jwtClaims.claims.registered.sub shouldBe expectedSubject
@@ -92,8 +94,9 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
       "issue token with registered claims when decoded should have the same values with the return registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
+          val (time, clock) = timeWithClock
           val adHocRegisteredClaims =
-            registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
+            registeredClaims.copy(iat = time.some, exp = time.plusSeconds(5.minutes.toSeconds).some, nbf = time.some)
           val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), clock)
           val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
@@ -115,6 +118,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       "issue token with only registered claims encrypted" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           whenever(config.encrypt.nonEmpty) {
+            val (_, clock) = timeWithClock
             val jwtIssuer = new JwtIssuer(config, clock)
             val jwt       = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
