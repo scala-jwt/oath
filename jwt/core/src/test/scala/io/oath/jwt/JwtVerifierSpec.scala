@@ -25,65 +25,59 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
                       ProvidedWithConfig(None, None, Nil),
                       LeewayWindowConfig(None, None, None, None))
 
-  def setRegisteredClaims(builder: JWTCreator.Builder, config: JwtVerifierConfig): JWTCreator.Builder =
-    builder
-      .tap(builder => config.providedWith.issuerClaim.map(nonEmptyString => builder.withIssuer(nonEmptyString.value)))
-      .tap(builder => config.providedWith.subjectClaim.map(nonEmptyString => builder.withSubject(nonEmptyString.value)))
-      .tap(builder => builder.withAudience(config.providedWith.audienceClaims.map(_.value): _*))
+  def setRegisteredClaims(builder: JWTCreator.Builder, config: JwtVerifierConfig): TestData = {
+    val leeway    = config.leewayWindow.leeway.map(leeway => now.plusSeconds(leeway.toSeconds - 1))
+    val expiresAt = config.leewayWindow.expiresAt.map(expiresAt => now.plusSeconds(expiresAt.toSeconds - 1))
+    val notBefore = config.leewayWindow.notBefore.map(notBefore => now.plusSeconds(notBefore.toSeconds - 1))
+    val issueAt   = config.leewayWindow.issuedAt.map(issueAt => now.plusSeconds(issueAt.toSeconds - 1))
+
+    val registeredClaims = RegisteredClaims(
+      config.providedWith.issuerClaim,
+      config.providedWith.subjectClaim,
+      config.providedWith.audienceClaims,
+      expiresAt orElse leeway,
+      notBefore orElse leeway,
+      issueAt orElse leeway,
+      None
+    )
+
+    val builderWithRefistered = builder
+      .tap(builder => registeredClaims.iss.map(nonEmptyString => builder.withIssuer(nonEmptyString.value)))
+      .tap(builder => registeredClaims.sub.map(nonEmptyString => builder.withSubject(nonEmptyString.value)))
+      .tap(builder => builder.withAudience(registeredClaims.aud.map(_.value): _*))
+      .tap(builder => registeredClaims.exp.map(builder.withExpiresAt))
+      .tap(builder => registeredClaims.nbf.map(builder.withNotBefore))
+      .tap(builder => registeredClaims.iat.map(builder.withIssuedAt))
+
+    TestData(registeredClaims, builderWithRefistered)
+  }
 
   "JwtVerifier" should {
 
     "verify token with prerequisite configurations" in forAll { config: JwtVerifierConfig =>
       val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
-      val leeway    = config.leewayWindow.leeway.map(leeway => now.plusSeconds(leeway.toSeconds - 1))
-      val expiresAt = config.leewayWindow.expiresAt.map(expiresAt => now.plusSeconds(expiresAt.toSeconds - 1))
-      val notBefore = config.leewayWindow.notBefore.map(notBefore => now.plusSeconds(notBefore.toSeconds - 1))
-      val issueAt   = config.leewayWindow.issuedAt.map(issueAt => now.plusSeconds(issueAt.toSeconds - 1))
+      val testData = setRegisteredClaims(JWT.create(), config)
 
-      val token = JWT
-        .create()
-        .tap(setRegisteredClaims(_, config))
-        .tap(builder => (expiresAt orElse leeway).map(builder.withExpiresAt))
-        .tap(builder => (notBefore orElse leeway).map(builder.withNotBefore))
-        .tap(builder => (issueAt orElse leeway).map(builder.withIssuedAt))
-        .sign(config.algorithm)
+      val token = testData.builder.sign(config.algorithm)
 
       val verified = jwtVerifier.verifyJwt(token.toToken).value
 
-      verified.registered shouldBe RegisteredClaims(
-        config.providedWith.issuerClaim,
-        config.providedWith.subjectClaim,
-        config.providedWith.audienceClaims,
-        expiresAt orElse leeway,
-        notBefore orElse leeway,
-        issueAt orElse leeway,
-        None
-      )
+      verified.registered shouldBe testData.registeredClaims
     }
 
     "verify a token with header" in forAll { (nestedHeader: NestedHeader, config: JwtVerifierConfig) =>
       val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
-      val token = JWT
-        .create()
-        .tap(setRegisteredClaims(_, config))
+      val testData = setRegisteredClaims(JWT.create(), config)
+
+      val token = testData.builder
         .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
         .sign(config.algorithm)
 
       val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
 
-      val expectedRegisteredClaims = RegisteredClaims(
-        config.providedWith.issuerClaim,
-        config.providedWith.subjectClaim,
-        config.providedWith.audienceClaims,
-        None,
-        None,
-        None,
-        None
-      )
-
-      verified.value shouldBe nestedHeader.toClaimsH.copy(registered = expectedRegisteredClaims)
+      verified.value shouldBe nestedHeader.toClaimsH.copy(registered = testData.registeredClaims)
     }
 
     "verify a token with header that is encrypted" in forAll {
@@ -91,53 +85,33 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         whenever(config.encrypt.nonEmpty) {
           val jwtVerifier = new JwtVerifier(config)
 
-          val token = JWT
-            .create()
-            .tap(setRegisteredClaims(_, config))
+          val testData = setRegisteredClaims(JWT.create(), config)
+
+          val token = testData.builder
             .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
             .sign(config.algorithm)
             .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), config.encrypt.value.secret))
             .value
             .value
 
-          val expectedRegisteredClaims = RegisteredClaims(
-            config.providedWith.issuerClaim,
-            config.providedWith.subjectClaim,
-            config.providedWith.audienceClaims,
-            None,
-            None,
-            None,
-            None
-          )
-
           val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
 
-          verified.value shouldBe nestedHeader.toClaimsH.copy(registered = expectedRegisteredClaims)
+          verified.value shouldBe nestedHeader.toClaimsH.copy(registered = testData.registeredClaims)
         }
     }
 
     "verify a token with payload" in forAll { (nestedPayload: NestedPayload, config: JwtVerifierConfig) =>
       val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
-      val token = JWT
-        .create()
-        .tap(setRegisteredClaims(_, config))
+      val testData = setRegisteredClaims(JWT.create(), config)
+
+      val token = testData.builder
         .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
         .sign(config.algorithm)
 
       val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
 
-      val expectedRegisteredClaims = RegisteredClaims(
-        config.providedWith.issuerClaim,
-        config.providedWith.subjectClaim,
-        config.providedWith.audienceClaims,
-        None,
-        None,
-        None,
-        None
-      )
-
-      verified.value shouldBe nestedPayload.toClaimsP.copy(registered = expectedRegisteredClaims)
+      verified.value shouldBe nestedPayload.toClaimsP.copy(registered = testData.registeredClaims)
     }
 
     "verify a token with payload that is encrypted" in forAll {
@@ -145,9 +119,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         whenever(config.encrypt.nonEmpty) {
           val jwtVerifier = new JwtVerifier(config)
 
-          val token = JWT
-            .create()
-            .tap(setRegisteredClaims(_, config))
+          val testData = setRegisteredClaims(JWT.create(), config)
+
+          val token = testData.builder
             .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
             .sign(config.algorithm)
             .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), config.encrypt.value.secret))
@@ -156,17 +130,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
           val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
 
-          val expectedRegisteredClaims = RegisteredClaims(
-            config.providedWith.issuerClaim,
-            config.providedWith.subjectClaim,
-            config.providedWith.audienceClaims,
-            None,
-            None,
-            None,
-            None
-          )
-
-          verified.value shouldBe nestedPayload.toClaimsP.copy(registered = expectedRegisteredClaims)
+          verified.value shouldBe nestedPayload.toClaimsP.copy(registered = testData.registeredClaims)
         }
     }
 
@@ -174,9 +138,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       (nestedHeader: NestedHeader, nestedPayload: NestedPayload, config: JwtVerifierConfig) =>
         val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
-        val token = JWT
-          .create()
-          .tap(setRegisteredClaims(_, config))
+        val testData = setRegisteredClaims(JWT.create(), config)
+
+        val token = testData.builder
           .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
           .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
           .sign(config.algorithm)
@@ -184,17 +148,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         val verified =
           jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
 
-        val expectedRegisteredClaims = RegisteredClaims(
-          config.providedWith.issuerClaim,
-          config.providedWith.subjectClaim,
-          config.providedWith.audienceClaims,
-          None,
-          None,
-          None,
-          None
-        )
-
-        verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = expectedRegisteredClaims)
+        verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = testData.registeredClaims)
     }
 
     "verify a token with header & payload that is encrypted" in forAll {
@@ -202,9 +156,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         whenever(config.encrypt.nonEmpty) {
           val jwtVerifier = new JwtVerifier(config)
 
-          val token = JWT
-            .create()
-            .tap(setRegisteredClaims(_, config))
+          val testData = setRegisteredClaims(JWT.create(), config)
+
+          val token = testData.builder
             .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
             .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
             .sign(config.algorithm)
@@ -215,17 +169,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
           val verified =
             jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
 
-          val expectedRegisteredClaims = RegisteredClaims(
-            config.providedWith.issuerClaim,
-            config.providedWith.subjectClaim,
-            config.providedWith.audienceClaims,
-            None,
-            None,
-            None,
-            None
-          )
-
-          verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = expectedRegisteredClaims)
+          verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = testData.registeredClaims)
         }
     }
 
