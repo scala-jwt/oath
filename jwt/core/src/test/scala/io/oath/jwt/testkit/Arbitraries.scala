@@ -1,5 +1,7 @@
 package io.oath.jwt.testkit
 
+import java.time.Instant
+
 import com.auth0.jwt.algorithms.Algorithm
 import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader.SimpleHeader
@@ -12,8 +14,9 @@ import io.oath.jwt.model.RegisteredClaims
 import io.oath.jwt.{NestedHeader, NestedPayload}
 import org.scalacheck.{Arbitrary, Gen}
 
-import java.time.Instant
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.Duration
+
+import scala.concurrent.duration.DurationInt
 
 trait Arbitraries {
 
