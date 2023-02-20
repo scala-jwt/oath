@@ -58,7 +58,7 @@ class CirceConversionSpec extends AnyWordSpecBase with CodecUtils {
         .pipe(NonEmptyString.unsafeFrom)
       val claims = jwtVerifier.verifyJwt[Foo](jwt.value.toTokenP)
 
-      claims.left.value shouldBe JwtVerifyError.DecodingError("Int: DownField(age)", null)
+      claims.left.value shouldBe JwtVerifyError.DecodingError("DecodingFailure at .age: Int", null)
     }
   }
 }
