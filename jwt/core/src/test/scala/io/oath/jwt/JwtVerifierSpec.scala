@@ -210,7 +210,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
 
-      verified shouldBe Left(JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null))
+      verified shouldBe Left(JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null))
     }
 
     "fail to decode a token with payload" in {
@@ -224,7 +224,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
 
-      verified shouldBe Left(JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null))
+      verified shouldBe Left(JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null))
     }
 
     "fail to decode a token with header & payload" in {
@@ -243,8 +243,8 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       verified shouldBe Left(
         JwtVerifyError.DecodingErrors(
-          JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null).some,
-          JwtVerifyError.DecodingError("Missing required field: DownField(mapping)", null).some
+          JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null).some,
+          JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null).some
         ))
     }
 
