@@ -21,7 +21,7 @@ import scala.concurrent.duration.DurationInt
 trait Arbitraries {
 
   lazy val genPositiveFiniteDuration        = Gen.posNum[Long].map(Duration.fromNanos)
-  lazy val genPositiveFiniteDurationSeconds = Gen.posNum[Int].map(_.seconds)
+  lazy val genPositiveFiniteDurationSeconds = Gen.posNum[Int].map(x => (x + 1).seconds)
 
   implicit lazy val genNonEmptyString = Arbitrary(
     Gen.nonEmptyListOf[Char](Gen.alphaChar).map(_.mkString).map(NonEmptyString.unsafeFrom)

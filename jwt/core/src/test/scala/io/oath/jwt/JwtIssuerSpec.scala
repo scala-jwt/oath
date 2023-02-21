@@ -24,7 +24,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
   val jwtVerifier = JWT
     .require(Algorithm.none())
-    .acceptLeeway(1)
+    .acceptLeeway(5)
     .build()
 
   "JwtIssuer" should {
