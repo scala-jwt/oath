@@ -23,8 +23,9 @@ c
 * [juror-core](https://mvnrepository.com/artifact/io.github.scala-jwt/juror)
 
 ```scala
-    val jwtCore = "io.github.scala-jwt" %% "jwt-core" % "0.0.0"
-    val juror   = "io.github.scala-jwt" %% "juror"    % "0.0.0"
+val csrfCore = "io.github.scala-jwt" %% "csrf-core" % "0.0.0"
+val jwtCore = "io.github.scala-jwt"  %% "jwt-core"  % "0.0.0"
+val juror   = "io.github.scala-jwt"  %% "juror"     % "0.0.0"
 ```
 
 ### Json Converters
@@ -32,11 +33,11 @@ c
 * [jwt-circe](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-circe)
 
 ```scala
-    val jwtCirce = "io.github.scala-jwt" %% "jwt-circe" % "0.0.0"
+val jwtCirce = "io.github.scala-jwt" %% "jwt-circe" % "0.0.0"
 ```
 
 * [jwt-jsoniter-scala](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-jsoniter-scala)
 
 ```scala
-    val jwtJsoniterScala = "io.github.scala-jwt" %% "jwt-jsoniter-scala" % "0.0.0"
+val jwtJsoniterScala = "io.github.scala-jwt" %% "jwt-jsoniter-scala" % "0.0.0"
 ```
