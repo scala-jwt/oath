@@ -1,35 +1,22 @@
 package io.oath.jwt.model
 
-sealed trait JwtVerifyError {
-  def error: String
-}
+sealed abstract class JwtVerifyError(val error: String) extends Exception(error)
 
 object JwtVerifyError {
 
-  final case class IllegalArgument(error: String) extends JwtVerifyError
+  final case class IllegalArgument(override val error: String) extends JwtVerifyError(error)
 
-  final case class AlgorithmMismatch(error: String) extends JwtVerifyError
+  final case class AlgorithmMismatch(override val error: String) extends JwtVerifyError(error)
 
-  final case class DecodingError(error: String, underlying: Throwable) extends JwtVerifyError
+  final case class DecodingError(override val error: String, underlying: Throwable) extends JwtVerifyError(error)
 
-  final case class DecodingErrors(headerDecodingError: Option[DecodingError],
-                                  payloadDecodingError: Option[DecodingError]
-  ) extends JwtVerifyError {
-    private val headerMessage =
-      headerDecodingError.map(decodingError => s"\nheader decoding error: ${decodingError.error}")
-    private val payloadMessage =
-      payloadDecodingError.map(decodingError => s"\npayload decoding error: ${decodingError.error}")
-    val error =
-      s"JWT Failed to decode both parts: ${headerMessage.getOrElse("")} ${payloadMessage.getOrElse("")}"
-  }
+  final case class VerificationError(override val error: String) extends JwtVerifyError(error)
 
-  final case class VerificationError(error: String) extends JwtVerifyError
+  final case class SignatureVerificationError(override val error: String) extends JwtVerifyError(error)
 
-  final case class SignatureVerificationError(error: String) extends JwtVerifyError
+  final case class DecryptionError(override val error: String) extends JwtVerifyError(error)
 
-  final case class DecryptionError(error: String) extends JwtVerifyError
+  final case class TokenExpired(override val error: String) extends JwtVerifyError(error)
 
-  final case class TokenExpired(error: String) extends JwtVerifyError
-
-  final case class UnexpectedError(error: String) extends JwtVerifyError
+  final case class UnexpectedError(override val error: String) extends JwtVerifyError(error)
 }

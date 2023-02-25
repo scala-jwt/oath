@@ -66,22 +66,12 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       payloadDecoder: ClaimsDecoder[P]
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     for {
-      jsonHeader  <- base64DecodeToken(decodedJwt.getHeader)
-      jsonPayload <- base64DecodeToken(decodedJwt.getPayload)
-      jwtClaims <- safeDecode(headerDecoder.decode(jsonHeader)) match {
-        case Right(header) =>
-          safeDecode(payloadDecoder.decode(jsonPayload)).left
-            .map(payloadDecodingError => JwtVerifyError.DecodingErrors(None, payloadDecodingError.some))
-            .map { payload =>
-              val registeredClaims = getRegisteredClaims(decodedJwt)
-              JwtClaims.ClaimsHP(header, payload, registeredClaims)
-            }
-        case Left(headerDecodingError) =>
-          safeDecode(payloadDecoder.decode(jsonPayload)).left.toOption
-            .pipe(JwtVerifyError.DecodingErrors(headerDecodingError.some, _))
-            .asLeft
-      }
-    } yield jwtClaims
+      jsonHeader    <- base64DecodeToken(decodedJwt.getHeader)
+      jsonPayload   <- base64DecodeToken(decodedJwt.getPayload)
+      headerClaims  <- safeDecode(headerDecoder.decode(jsonHeader))
+      payloadClaims <- safeDecode(payloadDecoder.decode(jsonPayload))
+      registeredClaims = getRegisteredClaims(decodedJwt)
+    } yield JwtClaims.ClaimsHP(headerClaims, payloadClaims, registeredClaims)
 
   private def handler(decodedJWT: => DecodedJWT): Either[JwtVerifyError, DecodedJWT] =
     allCatch
