@@ -61,28 +61,6 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       .withTry(decodedObject)
       .fold(error => JwtVerifyError.DecodingError(error.getMessage, error).asLeft, identity)
 
-  private def decodeWithErrorAccumulationClaimsHP[H, P](decodedJwt: DecodedJWT)(implicit
-      headerDecoder: ClaimsDecoder[H],
-      payloadDecoder: ClaimsDecoder[P]
-  ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
-    for {
-      jsonHeader  <- base64DecodeToken(decodedJwt.getHeader)
-      jsonPayload <- base64DecodeToken(decodedJwt.getPayload)
-      jwtClaims <- safeDecode(headerDecoder.decode(jsonHeader)) match {
-        case Right(header) =>
-          safeDecode(payloadDecoder.decode(jsonPayload)).left
-            .map(payloadDecodingError => JwtVerifyError.DecodingErrors(None, payloadDecodingError.some))
-            .map { payload =>
-              val registeredClaims = getRegisteredClaims(decodedJwt)
-              JwtClaims.ClaimsHP(header, payload, registeredClaims)
-            }
-        case Left(headerDecodingError) =>
-          safeDecode(payloadDecoder.decode(jsonPayload)).left.toOption
-            .pipe(JwtVerifyError.DecodingErrors(headerDecodingError.some, _))
-            .asLeft
-      }
-    } yield jwtClaims
-
   private def handler(decodedJWT: => DecodedJWT): Either[JwtVerifyError, DecodedJWT] =
     allCatch
       .withTry(decodedJWT)
@@ -143,7 +121,11 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       token          <- toNonEmptyString(jwt.token)
       decryptedToken <- decryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
-      jwtClaims      <- decodeWithErrorAccumulationClaimsHP[H, P](decodedJwt)
-    } yield jwtClaims
+      jsonHeader     <- base64DecodeToken(decodedJwt.getHeader)
+      jsonPayload    <- base64DecodeToken(decodedJwt.getPayload)
+      headerClaims   <- safeDecode(headerDecoder.decode(jsonHeader))
+      payloadClaims  <- safeDecode(payloadDecoder.decode(jsonPayload))
+      registeredClaims = getRegisteredClaims(decodedJwt)
+    } yield JwtClaims.ClaimsHP(headerClaims, payloadClaims, registeredClaims)
 
 }

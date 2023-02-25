@@ -1,4 +1,5 @@
 [![Build status](https://img.shields.io/github/workflow/status/scala-jwt/oath/Continuous%20Integration.svg)](https://github.com/scala-jwt/oath/actions)
+[![CI Status](https://github.com/scala-jwt/oath/actions/workflows/ci.yml/badge.svg)](https://github.com/scala-jwt/oath/actions/workflows/ci.yml)
 [![Coverage status](https://img.shields.io/codecov/c/github/scala-jwt/oath/master.svg)](https://codecov.io/github/scala-jwt/oath)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.scala-jwt/jwt-core_2.13.svg)](https://central.sonatype.dev/artifact/io.github.scala-jwt/jwt-core_2.13/0.0.6)
 

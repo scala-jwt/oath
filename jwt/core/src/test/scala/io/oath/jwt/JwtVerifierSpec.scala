@@ -230,22 +230,16 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     "fail to decode a token with header & payload" in {
       val jwtVerifier = new JwtVerifier(defaultConfig)
 
-      val header  = """{"name": "name"}"""
-      val payload = """{"name": "name"}"""
+      val header = """{"name": "name"}"""
       val token = JWT
         .create()
         .withHeader(unsafeParseJsonToJavaMap(header))
-        .withPayload(unsafeParseJsonToJavaMap(payload))
         .sign(defaultConfig.algorithm)
 
       val verified =
         jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
 
-      verified shouldBe Left(
-        JwtVerifyError.DecodingErrors(
-          JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null).some,
-          JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null).some
-        ))
+      verified shouldBe Left(JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null))
     }
 
     "fail to decode a token with header if exception raised in decoder" in {
@@ -282,7 +276,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       val verified =
         jwtVerifier.verifyJwt[SimpleHeader, SimplePayload](token.toTokenHP)
 
-      verified.left.value.error shouldBe "JWT Failed to decode both parts: \nheader decoding error: Boom \npayload decoding error: Boom"
+      verified.left.value.error shouldBe "Boom"
     }
 
     "fail to verify token with VerificationError when provided with claims are not meet criteria" in {
