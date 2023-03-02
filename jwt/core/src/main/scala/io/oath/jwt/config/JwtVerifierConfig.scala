@@ -48,6 +48,8 @@ object JwtVerifierConfig {
     LeewayWindowConfig(leeway, issuedAt, expiresAt, notBefore)
   }
 
+  def none(): JwtVerifierConfig = JwtVerifierConfig(Algorithm.none(), None, ProvidedWithConfig(), LeewayWindowConfig())
+
   def loadOrThrow(config: Config): JwtVerifierConfig = {
     val maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
     val algorithm = AlgorithmLoader.loadOrThrow(config.getConfig(AlgorithmConfigLocation), forIssuing = false)

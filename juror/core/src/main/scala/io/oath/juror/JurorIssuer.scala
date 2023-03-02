@@ -12,6 +12,12 @@ final class JurorIssuer[A] private (mapping: Map[A, JIssuer]) {
 
 object JurorIssuer {
 
+  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorIssuer[A] =
+    tokenEnumEntry.values
+      .map(_ -> new JIssuer(ConfigLoader.noneIssuer()))
+      .toMap
+      .pipe(mapping => new JurorIssuer(mapping))
+
   def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorIssuer[A] =
     tokenEnumEntry.mapping.view
       .mapValues(configLocation => ConfigLoader.loadOrThrowIssuer(configLocation))
