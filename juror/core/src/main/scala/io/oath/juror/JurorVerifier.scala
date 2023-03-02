@@ -12,6 +12,12 @@ final class JurorVerifier[A] private (mapping: Map[A, JVerifier]) {
 
 object JurorVerifier {
 
+  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorVerifier[A] =
+    tokenEnumEntry.values
+      .map(_ -> new JVerifier(ConfigLoader.noneVerifier()))
+      .toMap
+      .pipe(mapping => new JurorVerifier(mapping))
+
   def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorVerifier[A] =
     tokenEnumEntry.mapping.view
       .mapValues(configLocation => ConfigLoader.loadOrThrowVerifier(configLocation))

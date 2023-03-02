@@ -8,6 +8,8 @@ final case class JwtManagerConfig(issuer: JwtIssuerConfig, verifier: JwtVerifier
 
 object JwtManagerConfig {
 
+  def none() = JwtManagerConfig(JwtIssuerConfig.none(), JwtVerifierConfig.none())
+
   def loadOrThrow(location: String): JwtManagerConfig = ConfigFactory.load().getConfig(location).pipe(loadOrThrow)
 
   def loadOrThrow(config: Config): JwtManagerConfig =

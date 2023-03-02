@@ -12,6 +12,12 @@ final class JurorManager[A] private (mapping: Map[A, JManager]) {
 
 object JurorManager {
 
+  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorManager[A] =
+    tokenEnumEntry.values
+      .map(_ -> new JManager(ConfigLoader.noneManager()))
+      .toMap
+      .pipe(mapping => new JurorManager(mapping))
+
   def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): JurorManager[A] =
     tokenEnumEntry.mapping.view
       .mapValues(configLocation => ConfigLoader.loadOrThrowManager(configLocation))

@@ -46,6 +46,8 @@ object JwtIssuerConfig {
     )
   }
 
+  def none(): JwtIssuerConfig = JwtIssuerConfig(Algorithm.none(), None, RegisteredConfig())
+
   def loadOrThrow(config: Config): JwtIssuerConfig = {
     val algorithm         = AlgorithmLoader.loadOrThrow(config.getConfig(AlgorithmConfigLocation), forIssuing = true)
     val maybeIssuerScoped = config.getMaybeConfig(IssuerConfigLocation)
