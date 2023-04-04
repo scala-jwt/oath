@@ -14,7 +14,7 @@ object Dependencies {
     val jackson            = "2.14.2"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
-    val refined            = "0.10.2"
+    val refined            = "0.10.3"
     val circe              = "0.14.5"
     val jsoniterScala      = "2.22.1"
     val guava              = "31.1-jre"
