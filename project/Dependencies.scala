@@ -10,7 +10,7 @@ object Dependencies {
     val javaJWT            = "4.3.0"
     val config             = "1.4.2"
     val cats               = "2.9.0"
-    val bcprov             = "1.72"
+    val bcprov             = "1.73"
     val jackson            = "2.14.2"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
