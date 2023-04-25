@@ -11,7 +11,7 @@ object Dependencies {
     val config             = "1.4.2"
     val cats               = "2.9.0"
     val bcprov             = "1.73"
-    val jackson            = "2.14.2"
+    val jackson            = "2.15.0"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
     val refined            = "0.10.3"
