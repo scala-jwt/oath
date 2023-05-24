@@ -5,25 +5,22 @@
 
 ## Scala JWT - OATH
 
-__OATH__ provides a set of tools for WEB Applications
-1. CSRF token generation
-2. Authentication (Issuing JWT Tokens) 
-3. Authorization (Verifying JWT Tokens)
+__OATH__ provides an easy way for Rest API Applications to manipulate JWTs in complex systems.
+1. Customize registered claims via configuration. 
+1. Create a variety of JWT tokens with different configuration for each use case
+1. Token encryption.
 
 ### Modules
 
-* [CSRF Docs](./csrf/README.md) - CSRF token generator
 * [JWT Docs](./jwt/README.md) - A Scala API of [java-jwt](https://github.com/auth0/java-jwt)
 * [Juror Docs](./juror/README.md) - Extension of JWT to manipulate different type of tokens
 
 ### SBT Dependencies
 
-* [csrf-core](https://mvnrepository.com/artifact/io.github.scala-jwt/csrf-core)
 * [jwt-core](https://mvnrepository.com/artifact/io.github.scala-jwt/jwt-core)
 * [juror-core](https://mvnrepository.com/artifact/io.github.scala-jwt/juror)
 
 ```scala
-val csrfCore = "io.github.scala-jwt" %% "csrf-core" % "0.0.0"
 val jwtCore = "io.github.scala-jwt"  %% "jwt-core"  % "0.0.0"
 val juror   = "io.github.scala-jwt"  %% "juror"     % "0.0.0"
 ```

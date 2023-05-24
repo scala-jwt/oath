@@ -1,4 +1,4 @@
-import sbt.Keys.libraryDependencies
+import sbt.Keys._
 import sbt._
 
 object Dependencies {
@@ -9,7 +9,6 @@ object Dependencies {
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
-    val cats               = "2.9.0"
     val bcprov             = "1.73"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
@@ -59,7 +58,6 @@ object Dependencies {
 
     val juror = Seq(guava, enumeratum)
     val jwt   = Seq(config, bcprov)
-    val csrf  = Seq(config)
   }
 
   object Auth0 {
@@ -76,9 +74,6 @@ object Dependencies {
 
   lazy val jwtJsoniterScala =
     libraryDependencies ++= JsoniterScala.all
-
-  lazy val csrfCore =
-    libraryDependencies ++= Refined.all ++ Utils.csrf ++ Testing.all
 
   lazy val juror =
     libraryDependencies ++= Utils.juror
