@@ -60,7 +60,6 @@ object Dependencies {
 
     val juror = Seq(guava, enumeratum)
     val jwt   = Seq(config, cats, bcprov)
-    val csrf  = Seq(config, cats)
   }
 
   object Auth0 {
@@ -77,9 +76,6 @@ object Dependencies {
 
   lazy val jwtJsoniterScala =
     libraryDependencies ++= JsoniterScala.all
-
-  lazy val csrfCore =
-    libraryDependencies ++= Refined.all ++ Utils.csrf ++ Testing.all
 
   lazy val juror =
     libraryDependencies ++= Utils.juror

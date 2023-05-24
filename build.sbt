@@ -72,14 +72,9 @@ lazy val juror = Projects
   .settings(Dependencies.juror)
   .dependsOn(jwtCore % "compile->compile;test->test")
 
-lazy val csrfCore = Projects
-  .createModule("csrf-core", "csrf/core")
-  .settings(Dependencies.csrfCore)
-
 lazy val modules: Seq[ProjectReference] = Seq(
   juror,
   jwtCore,
   jwtCirce,
   jwtJsoniterScala,
-  csrfCore
 )
