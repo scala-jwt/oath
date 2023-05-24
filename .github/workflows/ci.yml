@@ -97,11 +97,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: mkdir -p juror/core/target jwt/circe/target jwt/jsoniter-scala/target csrf/core/target jwt/core/target target project/target
+        run: mkdir -p juror/core/target jwt/circe/target jwt/jsoniter-scala/target jwt/core/target target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: tar cf targets.tar juror/core/target jwt/circe/target jwt/jsoniter-scala/target csrf/core/target jwt/core/target target project/target
+        run: tar cf targets.tar juror/core/target jwt/circe/target jwt/jsoniter-scala/target jwt/core/target target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
