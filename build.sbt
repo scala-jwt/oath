@@ -76,5 +76,5 @@ lazy val modules: Seq[ProjectReference] = Seq(
   juror,
   jwtCore,
   jwtCirce,
-  jwtJsoniterScala,
+  jwtJsoniterScala
 )
