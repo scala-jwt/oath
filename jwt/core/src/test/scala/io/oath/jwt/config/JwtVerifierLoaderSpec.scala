@@ -1,7 +1,6 @@
 package io.oath.jwt.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
 import io.oath.jwt.testkit.AnyWordSpecBase
 
@@ -41,9 +40,9 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe empty
-      config.providedWith.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.providedWith.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.providedWith.issuerClaim shouldBe "issuer"
+      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some
       config.leewayWindow.expiresAt shouldBe 3.minutes.some
@@ -55,10 +54,10 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenWithEncryptionConfigLocation)
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe Some(EncryptConfig(NonEmptyString.unsafeFrom("password")))
-      config.providedWith.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.providedWith.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.encrypt shouldBe Some(EncryptConfig("password"))
+      config.providedWith.issuerClaim shouldBe "issuer"
+      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some
       config.leewayWindow.expiresAt shouldBe 3.minutes.some
@@ -70,9 +69,9 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val config = JwtVerifierConfig.loadOrThrow(TokenConfigLocation)
 
       config.encrypt shouldBe empty
-      config.providedWith.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.providedWith.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.providedWith.issuerClaim shouldBe "issuer"
+      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some
       config.leewayWindow.expiresAt shouldBe 3.minutes.some

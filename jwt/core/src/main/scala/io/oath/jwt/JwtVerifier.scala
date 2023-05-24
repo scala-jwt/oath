@@ -3,7 +3,6 @@ package io.oath.jwt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.JwtVerifierConfig
 import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
 import io.oath.jwt.utils._
@@ -17,13 +16,11 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   private lazy val jwtVerifier =
     JWT
       .require(config.algorithm)
-      .tap(jwtVerification =>
-        config.providedWith.issuerClaim.map(nonEmptyString => jwtVerification.withIssuer(nonEmptyString.value)))
-      .tap(jwtVerification =>
-        config.providedWith.subjectClaim.map(nonEmptyString => jwtVerification.withSubject(nonEmptyString.value)))
+      .tap(jwtVerification => config.providedWith.issuerClaim.map(str => jwtVerification.withIssuer(str)))
+      .tap(jwtVerification => config.providedWith.subjectClaim.map(str => jwtVerification.withSubject(str)))
       .tap(jwtVerification =>
         if (config.providedWith.audienceClaims.nonEmpty)
-          jwtVerification.withAudience(config.providedWith.audienceClaims.map(_.value).toArray: _*))
+          jwtVerification.withAudience(config.providedWith.audienceClaims: _*))
       .tap(jwtVerification =>
         config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds)))
       .tap(jwtVerification =>
@@ -45,13 +42,13 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       jti = decodedJWT.getOptionNonEmptyStringID
     )
 
-  private def decryptJwt(token: NonEmptyString): Either[JwtVerifyError.DecryptionError, NonEmptyString] =
+  private def decryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
     config.encrypt
       .map(encryptionConfig => DecryptionUtils.decryptAES(token, encryptionConfig.secret))
       .getOrElse(Right(token))
 
-  private def toNonEmptyString(token: String): Either[JwtVerifyError.VerificationError, NonEmptyString] =
-    NonEmptyString.from(token).left.map(error => JwtVerifyError.VerificationError(s"JWT Token error: $error"))
+  private def validateToken(token: String): Either[JwtVerifyError.VerificationError, String] =
+    Option(token).filter(_.nonEmpty).toRight(JwtVerifyError.VerificationError("JWT Token is empty."))
 
   private def safeDecode[T](
       decodedObject: => Either[JwtVerifyError.DecodingError, T]
@@ -74,15 +71,15 @@ final class JwtVerifier(config: JwtVerifierConfig) {
         case e                                 => JwtVerifyError.UnexpectedError(e.getMessage)
       }
 
-  private def verify(token: NonEmptyString): Either[JwtVerifyError, DecodedJWT] =
+  private def verify(token: String): Either[JwtVerifyError, DecodedJWT] =
     handler(
       jwtVerifier
-        .verify(token.value)
+        .verify(token)
     )
 
   def verifyJwt(jwt: JwtToken.Token): Either[JwtVerifyError, JwtClaims.Claims] =
     for {
-      token          <- toNonEmptyString(jwt.token)
+      token          <- validateToken(jwt.token)
       decryptedToken <- decryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       registeredClaims = getRegisteredClaims(decodedJwt)
@@ -92,7 +89,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       claimsDecoder: ClaimsDecoder[H]
   ): Either[JwtVerifyError, JwtClaims.ClaimsH[H]] =
     for {
-      token          <- toNonEmptyString(jwt.token)
+      token          <- validateToken(jwt.token)
       decryptedToken <- decryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       json           <- base64DecodeToken(decodedJwt.getHeader)
@@ -104,7 +101,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       claimsDecoder: ClaimsDecoder[P]
   ): Either[JwtVerifyError, JwtClaims.ClaimsP[P]] =
     for {
-      token          <- toNonEmptyString(jwt.token)
+      token          <- validateToken(jwt.token)
       decryptedToken <- decryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       json           <- base64DecodeToken(decodedJwt.getPayload)
@@ -117,7 +114,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       payloadDecoder: ClaimsDecoder[P]
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     for {
-      token          <- toNonEmptyString(jwt.token)
+      token          <- validateToken(jwt.token)
       decryptedToken <- decryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       jsonHeader     <- base64DecodeToken(decodedJwt.getHeader)

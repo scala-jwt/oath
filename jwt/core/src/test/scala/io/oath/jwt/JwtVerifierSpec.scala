@@ -2,7 +2,6 @@ package io.oath.jwt
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.{JWT, JWTCreator}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
@@ -14,7 +13,6 @@ import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
 import io.oath.jwt.utils._
 
 import cats.implicits.catsSyntaxEitherId
-import cats.implicits.catsSyntaxOptionId
 import scala.util.chaining.scalaUtilChainingOps
 
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper with CodecUtils {
@@ -43,9 +41,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     )
 
     val builderWithRefistered = builder
-      .tap(builder => registeredClaims.iss.map(nonEmptyString => builder.withIssuer(nonEmptyString.value)))
-      .tap(builder => registeredClaims.sub.map(nonEmptyString => builder.withSubject(nonEmptyString.value)))
-      .tap(builder => builder.withAudience(registeredClaims.aud.map(_.value): _*))
+      .tap(builder => registeredClaims.iss.map(str => builder.withIssuer(str)))
+      .tap(builder => registeredClaims.sub.map(str => builder.withSubject(str)))
+      .tap(builder => builder.withAudience(registeredClaims.aud: _*))
       .tap(builder => registeredClaims.exp.map(builder.withExpiresAt))
       .tap(builder => registeredClaims.nbf.map(builder.withNotBefore))
       .tap(builder => registeredClaims.iat.map(builder.withIssuedAt))
@@ -91,8 +89,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
           val token = testData.builder
             .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
             .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), config.encrypt.value.secret))
-            .value
+            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
             .value
 
           val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
@@ -125,8 +122,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
           val token = testData.builder
             .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
             .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), config.encrypt.value.secret))
-            .value
+            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
             .value
 
           val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
@@ -163,8 +159,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
             .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
             .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
             .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), config.encrypt.value.secret))
-            .value
+            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
             .value
 
           val verified =
@@ -175,14 +170,13 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "fail to verify a token that is encrypted" in {
-      val encryptConfig = defaultConfig.copy(encrypt = EncryptConfig(NonEmptyString.unsafeFrom("secret")).some)
+      val encryptConfig = defaultConfig.copy(encrypt = Some(EncryptConfig("secret")))
       val jwtVerifier   = new JwtVerifier(encryptConfig)
 
       val token = JWT
         .create()
         .sign(encryptConfig.algorithm)
-        .pipe(token => EncryptionUtils.encryptAES(NonEmptyString.unsafeFrom(token), encryptConfig.encrypt.value.secret))
-        .value
+        .pipe(token => EncryptionUtils.encryptAES(token, encryptConfig.encrypt.value.secret))
         .value
 
       val outOfRangeLongerToken  = token + "H"
@@ -280,8 +274,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "fail to verify token with VerificationError when provided with claims are not meet criteria" in {
-      val config = defaultConfig.copy(providedWith =
-        defaultConfig.providedWith.copy(issuerClaim = Some(NonEmptyString.unsafeFrom("issuer"))))
+      val config      = defaultConfig.copy(providedWith = defaultConfig.providedWith.copy(issuerClaim = Some("issuer")))
       val jwtVerifier = new JwtVerifier(config)
 
       val token = JWT
@@ -365,19 +358,19 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       verified.left.value shouldBe
         JwtVerifyError
-          .VerificationError(s"JWT Token error: Predicate isEmpty() did not fail.")
+          .VerificationError("JWT Token is empty.")
 
       verifiedH.left.value shouldBe
         JwtVerifyError
-          .VerificationError(s"JWT Token error: Predicate isEmpty() did not fail.")
+          .VerificationError("JWT Token is empty.")
 
       verifiedP.left.value shouldBe
         JwtVerifyError
-          .VerificationError(s"JWT Token error: Predicate isEmpty() did not fail.")
+          .VerificationError("JWT Token is empty.")
 
       verifiedHP.left.value shouldBe
         JwtVerifyError
-          .VerificationError(s"JWT Token error: Predicate isEmpty() did not fail.")
+          .VerificationError("JWT Token is empty.")
     }
   }
 }

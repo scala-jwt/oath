@@ -2,7 +2,6 @@ package io.oath.jwt.config
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.{Config, ConfigFactory}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
 
 import scala.concurrent.duration.FiniteDuration
@@ -13,9 +12,9 @@ final case class JwtIssuerConfig(algorithm: Algorithm, encrypt: Option[EncryptCo
 
 object JwtIssuerConfig {
 
-  final case class RegisteredConfig(issuerClaim: Option[NonEmptyString] = None,
-                                    subjectClaim: Option[NonEmptyString] = None,
-                                    audienceClaims: Seq[NonEmptyString] = Seq.empty,
+  final case class RegisteredConfig(issuerClaim: Option[String] = None,
+                                    subjectClaim: Option[String] = None,
+                                    audienceClaims: Seq[String] = Seq.empty,
                                     includeJwtIdClaim: Boolean = false,
                                     includeIssueAtClaim: Boolean = false,
                                     expiresAtOffset: Option[FiniteDuration] = None,

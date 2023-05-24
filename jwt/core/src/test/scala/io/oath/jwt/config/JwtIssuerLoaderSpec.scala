@@ -1,7 +1,6 @@
 package io.oath.jwt.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
 import io.oath.jwt.testkit.AnyWordSpecBase
 
@@ -40,9 +39,9 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.registered.issuerClaim shouldBe "issuer"
+      config.registered.subjectClaim shouldBe "subject"
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some
@@ -54,10 +53,10 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenWithEncryptionConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe Some(EncryptConfig(NonEmptyString.unsafeFrom("password")))
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.encrypt shouldBe Some(EncryptConfig("password"))
+      config.registered.issuerClaim shouldBe "issuer"
+      config.registered.subjectClaim shouldBe "subject"
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some
@@ -69,9 +68,9 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config = JwtIssuerConfig.loadOrThrow(TokenConfigLocation)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.registered.issuerClaim shouldBe "issuer"
+      config.registered.subjectClaim shouldBe "subject"
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some

@@ -1,6 +1,5 @@
 package io.oath.jwt.utils
 
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.model.JwtIssueError
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -24,15 +23,12 @@ object EncryptionUtils {
     new String(hexChars)
   }
 
-  private[oath] def encryptAES(message: NonEmptyString,
-                               secret: NonEmptyString
-  ): Either[JwtIssueError.EncryptionError, NonEmptyString] =
+  private[oath] def encryptAES(message: String, secret: String): Either[JwtIssueError.EncryptionError, String] =
     allCatch.withTry {
-      val raw           = java.util.Arrays.copyOf(secret.value.getBytes(UTF8), 16)
+      val raw           = java.util.Arrays.copyOf(secret.getBytes(UTF8), 16)
       val secretKeySpec = new SecretKeySpec(raw, AES)
       val cipher        = Cipher.getInstance(AES)
       cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec)
-      val hexString = toHexString(cipher.doFinal(message.value.getBytes(UTF8)))
-      NonEmptyString.unsafeFrom(hexString)
+      toHexString(cipher.doFinal(message.getBytes(UTF8)))
     }.toEither.left.map(e => JwtIssueError.EncryptionError(e.getMessage))
 }

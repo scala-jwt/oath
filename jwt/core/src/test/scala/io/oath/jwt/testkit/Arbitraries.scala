@@ -3,7 +3,6 @@ package io.oath.jwt.testkit
 import java.time.Instant
 
 import com.auth0.jwt.algorithms.Algorithm
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader.SimpleHeader
 import io.oath.jwt.NestedPayload.SimplePayload
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
@@ -24,7 +23,7 @@ trait Arbitraries {
   lazy val genPositiveFiniteDurationSeconds = Gen.posNum[Int].map(x => (x + 1).seconds)
 
   implicit lazy val genNonEmptyString = Arbitrary(
-    Gen.nonEmptyListOf[Char](Gen.alphaChar).map(_.mkString).map(NonEmptyString.unsafeFrom)
+    Gen.nonEmptyListOf[Char](Gen.alphaChar).map(_.mkString)
   )
   implicit lazy val arbInstant: Arbitrary[Instant] = Arbitrary(
     Gen.chooseNum(Long.MinValue, Long.MaxValue).map(Instant.ofEpochMilli)

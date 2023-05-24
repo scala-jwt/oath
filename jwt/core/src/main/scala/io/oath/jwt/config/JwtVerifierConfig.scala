@@ -2,7 +2,6 @@ package io.oath.jwt.config
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.{Config, ConfigFactory}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
 import io.oath.jwt.config.JwtVerifierConfig._
 
@@ -16,9 +15,9 @@ final case class JwtVerifierConfig(algorithm: Algorithm,
 
 object JwtVerifierConfig {
 
-  final case class ProvidedWithConfig(issuerClaim: Option[NonEmptyString] = None,
-                                      subjectClaim: Option[NonEmptyString] = None,
-                                      audienceClaims: Seq[NonEmptyString] = Seq.empty
+  final case class ProvidedWithConfig(issuerClaim: Option[String] = None,
+                                      subjectClaim: Option[String] = None,
+                                      audienceClaims: Seq[String] = Seq.empty
   )
 
   final case class LeewayWindowConfig(leeway: Option[FiniteDuration] = None,

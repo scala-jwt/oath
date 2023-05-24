@@ -1,13 +1,12 @@
 package io.oath.jwt.config
 
 import com.typesafe.config.Config
-import eu.timepit.refined.types.string.NonEmptyString
 
 import scala.util.chaining.scalaUtilChainingOps
 
 object EncryptionLoader {
 
-  final case class EncryptConfig(secret: NonEmptyString)
+  final case class EncryptConfig(secret: String)
 
   private def loadOrThrowEncryptConfig(encryptScoped: Config): EncryptConfig =
     encryptScoped

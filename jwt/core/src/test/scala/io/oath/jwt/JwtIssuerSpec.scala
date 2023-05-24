@@ -2,7 +2,6 @@ package io.oath.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
 import io.oath.jwt.config.JwtIssuerConfig
@@ -36,15 +35,14 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt().value
 
-        val decodedJWT = jwtVerifier.verify(jwtClaims.token.value)
+        val decodedJWT = jwtVerifier.verify(jwtClaims.token)
 
-        Option(decodedJWT.getIssuer).flatMap(NonEmptyString.unapply) shouldBe config.registered.issuerClaim
-        Option(decodedJWT.getSubject).flatMap(NonEmptyString.unapply) shouldBe config.registered.subjectClaim
+        Option(decodedJWT.getIssuer) shouldBe config.registered.issuerClaim
+        Option(decodedJWT.getSubject) shouldBe config.registered.subjectClaim
         Option(decodedJWT.getAudience)
           .map(_.asScala.toSeq)
           .sequence
-          .flatten
-          .flatMap(NonEmptyString.unapply) shouldBe config.registered.audienceClaims
+          .flatten shouldBe config.registered.audienceClaims
 
         Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe Option.when(config.registered.includeIssueAtClaim)(now)
 
@@ -100,17 +98,16 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
           val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
-          val decodedJWT = jwtVerifier.verify(jwtClaims.token.value)
+          val decodedJWT = jwtVerifier.verify(jwtClaims.token)
 
-          Option(decodedJWT.getIssuer).flatMap(NonEmptyString.unapply) shouldBe jwtClaims.claims.registered.iss
-          Option(decodedJWT.getSubject).flatMap(NonEmptyString.unapply) shouldBe jwtClaims.claims.registered.sub
+          Option(decodedJWT.getIssuer) shouldBe jwtClaims.claims.registered.iss
+          Option(decodedJWT.getSubject) shouldBe jwtClaims.claims.registered.sub
           Option(decodedJWT.getAudience)
             .map(_.asScala.toSeq)
             .sequence
-            .flatten
-            .flatMap(NonEmptyString.unapply) shouldBe jwtClaims.claims.registered.aud
+            .flatten shouldBe jwtClaims.claims.registered.aud
           Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe jwtClaims.claims.registered.iat
-          Option(decodedJWT.getId).flatMap(NonEmptyString.unapply) shouldBe jwtClaims.claims.registered.jti
+          Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
           Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe jwtClaims.claims.registered.exp
           Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe jwtClaims.claims.registered.nbf
       }
@@ -122,8 +119,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
             val jwtIssuer = new JwtIssuer(config, clock)
             val jwt       = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
-            jwt.token.value should fullyMatch regex """[0123456789ABCDEF]+"""
-            jwt.token.value.length % 16 shouldBe 0
+            jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
+            jwt.token.length % 16 shouldBe 0
           }
       }
 
@@ -132,7 +129,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
         val result = jwtVerifier
-          .verify(jwt.token.value)
+          .verify(jwt.token)
           .pipe(_.getHeader)
           .pipe(base64DecodeToken)
           .pipe(_.value)
@@ -147,8 +144,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val jwtIssuer = new JwtIssuer(config)
           val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
-          jwt.token.value should fullyMatch regex """[0123456789ABCDEF]+"""
-          jwt.token.value.length % 16 shouldBe 0
+          jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
+          jwt.token.length % 16 shouldBe 0
         }
       }
 
@@ -157,7 +154,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
         val result = jwtVerifier
-          .verify(jwt.token.value)
+          .verify(jwt.token)
           .pipe(_.getPayload)
           .pipe(base64DecodeToken)
           .pipe(_.value)
@@ -172,8 +169,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val jwtIssuer = new JwtIssuer(config)
           val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
-          jwt.token.value should fullyMatch regex """[0123456789ABCDEF]+"""
-          jwt.token.value.length % 16 shouldBe 0
+          jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
+          jwt.token.length % 16 shouldBe 0
         }
       }
 
@@ -183,7 +180,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
 
           val (headerResult, payloadResult) = jwtVerifier
-            .verify(jwt.token.value)
+            .verify(jwt.token)
             .pipe(decodedJwt =>
               base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value)
             .pipe { case (headerJson, payloadJson) =>
@@ -201,8 +198,8 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
             val jwtIssuer = new JwtIssuer(config)
             val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
 
-            jwt.token.value should fullyMatch regex """[0123456789ABCDEF]+"""
-            jwt.token.value.length % 16 shouldBe 0
+            jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
+            jwt.token.length % 16 shouldBe 0
           }
       }
 

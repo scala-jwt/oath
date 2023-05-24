@@ -2,7 +2,6 @@ package io.oath.jwt.jsoniter
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.JwtIssuerConfig.RegisteredConfig
 import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
 import io.oath.jwt.config.{JwtIssuerConfig, JwtVerifierConfig}
@@ -12,7 +11,6 @@ import io.oath.jwt.utils._
 import io.oath.jwt.{JwtIssuer, JwtVerifier}
 
 import io.oath.jwt.syntax.TokenOps
-import scala.util.chaining.scalaUtilChainingOps
 
 class JsoniterConversionSpec extends AnyWordSpecBase with CodecUtils {
 
@@ -35,7 +33,7 @@ class JsoniterConversionSpec extends AnyWordSpecBase with CodecUtils {
     "convert jsoniter codec to claims (encoders & decoders)" in {
       val bar    = Bar("bar", 10)
       val jwt    = jwtIssuer.issueJwt(JwtClaims.ClaimsP(bar)).value
-      val claims = jwtVerifier.verifyJwt[Bar](jwt.token.value.toTokenP).value
+      val claims = jwtVerifier.verifyJwt[Bar](jwt.token.toTokenP).value
 
       claims.payload shouldBe bar
     }
@@ -46,8 +44,7 @@ class JsoniterConversionSpec extends AnyWordSpecBase with CodecUtils {
         .create()
         .withPayload(unsafeParseJsonToJavaMap(fooJson))
         .sign(Algorithm.none())
-        .pipe(NonEmptyString.unsafeFrom)
-      val claims = jwtVerifier.verifyJwt[Bar](jwt.value.toTokenP)
+      val claims = jwtVerifier.verifyJwt[Bar](jwt.toTokenP)
 
       val decodingError: JwtVerifyError = claims.left.value
       decodingError.error should startWith("illegal number, offset: 0x00000016, buf:")

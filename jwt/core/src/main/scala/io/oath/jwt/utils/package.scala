@@ -6,7 +6,6 @@ import java.util.Base64
 
 import com.auth0.jwt.JWTCreator.Builder
 import com.auth0.jwt.interfaces.DecodedJWT
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.model.{JwtIssueError, JwtVerifyError}
 
 import scala.util.control.Exception.allCatch
@@ -27,20 +26,20 @@ package object utils {
       .map(JwtVerifyError.DecodingError("Base64 decode failure.", _))
 
   private[oath] implicit class DecodedJWTOps(private val decodedJWT: DecodedJWT) {
-    def getOptionNonEmptyStringIssuer: Option[NonEmptyString] =
+    def getOptionNonEmptyStringIssuer: Option[String] =
       Option(decodedJWT.getIssuer)
-        .flatMap(NonEmptyString.unapply)
+        .filter(_.nonEmpty)
 
-    def getOptionNonEmptyStringSubject: Option[NonEmptyString] =
+    def getOptionNonEmptyStringSubject: Option[String] =
       Option(decodedJWT.getSubject)
-        .flatMap(NonEmptyString.unapply)
+        .filter(_.nonEmpty)
 
-    def getOptionNonEmptyStringID: Option[NonEmptyString] =
+    def getOptionNonEmptyStringID: Option[String] =
       Option(decodedJWT.getId)
-        .flatMap(NonEmptyString.unapply)
+        .filter(_.nonEmpty)
 
-    def getSeqNonEmptyStringAudience: Seq[NonEmptyString] =
-      Option(decodedJWT.getAudience).map(_.asScala).toSeq.flatMap(_.flatMap(NonEmptyString.unapply))
+    def getSeqNonEmptyStringAudience: Seq[String] =
+      Option(decodedJWT.getAudience).map(_.asScala).toSeq.flatMap(_.filter(_.nonEmpty))
 
     def getOptionExpiresAt: Option[Instant] =
       Option(decodedJWT.getExpiresAt).map(_.toInstant)
