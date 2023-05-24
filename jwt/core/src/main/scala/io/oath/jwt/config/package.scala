@@ -6,7 +6,6 @@ import eu.timepit.refined.types.string.NonEmptyString
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.Exception.allCatch
 
-import cats.implicits.catsSyntaxOptionId
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.jdk.DurationConverters.JavaDurationOps
 
@@ -26,7 +25,7 @@ package object config {
 
     def getMaybeFiniteDuration(path: String): Option[FiniteDuration] =
       allCatch
-        .withTry(config.getDuration(path).toScala.some)
+        .withTry(Some(config.getDuration(path).toScala))
         .recover(ifMissingDefault(None))
         .get
 
