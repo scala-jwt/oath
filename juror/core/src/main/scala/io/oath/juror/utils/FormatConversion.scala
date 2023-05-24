@@ -1,8 +1,7 @@
 package io.oath.juror.utils
 
-import com.google.common.base.CaseFormat
-
 private[juror] object FormatConversion {
 
-  def convertUpperCamelToLowerHyphen(str: String): String = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_HYPHEN, str)
+  def convertUpperCamelToLowerHyphen(str: String): String =
+    str.split("(?=\\p{Lu})").map(_.trim.toLowerCase).filter(_.nonEmpty).mkString("-").trim
 }
