@@ -53,14 +53,13 @@ object Dependencies {
 
   object Utils {
     val config     = "com.typesafe"     % "config"         % Versions.config
-    val cats       = "org.typelevel"   %% "cats-core"      % Versions.cats
     val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
     val guava      = "com.google.guava" % "guava"          % Versions.guava
     val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
     val juror = Seq(guava, enumeratum)
-    val jwt   = Seq(config, cats, bcprov)
-    val csrf  = Seq(config, cats)
+    val jwt   = Seq(config, bcprov)
+    val csrf  = Seq(config)
   }
 
   object Auth0 {

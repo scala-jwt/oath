@@ -1,6 +1,5 @@
 package io.oath.jwt
 
-import cats.syntax.all._
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -59,7 +58,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   ): Either[JwtVerifyError.DecodingError, T] =
     allCatch
       .withTry(decodedObject)
-      .fold(error => JwtVerifyError.DecodingError(error.getMessage, error).asLeft, identity)
+      .fold(error => Left(JwtVerifyError.DecodingError(error.getMessage, error)), identity)
 
   private def handler(decodedJWT: => DecodedJWT): Either[JwtVerifyError, DecodedJWT] =
     allCatch
