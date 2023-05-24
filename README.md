@@ -9,7 +9,7 @@ __OATH__ provides a set of tools for WEB Applications
 1. CSRF token generation
 2. Authentication (Issuing JWT Tokens) 
 3. Authorization (Verifying JWT Tokens)
-c
+
 ### Modules
 
 * [CSRF Docs](./csrf/README.md) - CSRF token generator
