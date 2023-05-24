@@ -1,4 +1,4 @@
-import sbt.Keys.libraryDependencies
+import sbt.Keys._
 import sbt._
 
 object Dependencies {
@@ -9,7 +9,6 @@ object Dependencies {
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
-    val cats               = "2.9.0"
     val bcprov             = "1.73"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
@@ -53,13 +52,12 @@ object Dependencies {
 
   object Utils {
     val config     = "com.typesafe"     % "config"         % Versions.config
-    val cats       = "org.typelevel"   %% "cats-core"      % Versions.cats
     val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
     val guava      = "com.google.guava" % "guava"          % Versions.guava
     val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
     val juror = Seq(guava, enumeratum)
-    val jwt   = Seq(config, cats, bcprov)
+    val jwt   = Seq(config, bcprov)
   }
 
   object Auth0 {
