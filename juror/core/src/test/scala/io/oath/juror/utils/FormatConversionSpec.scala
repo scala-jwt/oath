@@ -1,7 +1,6 @@
 package io.oath.juror.utils
 
-import enumeratum.EnumEntry
-import enumeratum.Enum
+import enumeratum.{Enum, EnumEntry}
 import io.oath.jwt.testkit.AnyWordSpecBase
 
 class FormatConversionSpec extends AnyWordSpecBase {
@@ -9,8 +8,8 @@ class FormatConversionSpec extends AnyWordSpecBase {
   "FormatConversion" should {
 
     "convert upper camel case to lower hyphen" in {
-      val res1     = FormatConversion.convertUpperCamelToLowerHyphen("HelloWorld")
-      val res2     = FormatConversion.convertUpperCamelToLowerHyphen(" Hello World ")
+      val res1 = FormatConversion.convertUpperCamelToLowerHyphen("HelloWorld")
+      val res2 = FormatConversion.convertUpperCamelToLowerHyphen(" Hello World ")
 
       val expected = "hello-world"
 
