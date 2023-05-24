@@ -52,10 +52,10 @@ object Dependencies {
   }
 
   object Utils {
-    val config     = "com.typesafe"               % "config"           % Versions.config
-    val bcprov     = "org.bouncycastle"           % "bcprov-jdk18on"   % Versions.bcprov
-    val guava      = "com.google.guava"           % "guava"            % Versions.guava
-    val enumeratum = "com.beachape"              %% "enumeratum"       % Versions.enumeratum
+    val config     = "com.typesafe"     % "config"         % Versions.config
+    val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
+    val guava      = "com.google.guava" % "guava"          % Versions.guava
+    val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
     val juror = Seq(guava, enumeratum)
     val jwt   = Seq(config, bcprov)
