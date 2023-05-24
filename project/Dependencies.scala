@@ -10,12 +10,9 @@ object Dependencies {
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
     val bcprov             = "1.73"
-    val logbackClassic     = "1.4.5"
-    val scalaLogging       = "3.9.5"
     val refined            = "0.10.3"
     val circe              = "0.14.5"
     val jsoniterScala      = "2.23.0"
-    val guava              = "31.1-jre"
     val enumeratum         = "1.7.2"
   }
 
@@ -53,10 +50,9 @@ object Dependencies {
   object Utils {
     val config     = "com.typesafe"     % "config"         % Versions.config
     val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
-    val guava      = "com.google.guava" % "guava"          % Versions.guava
     val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
-    val juror = Seq(guava, enumeratum)
+    val juror = Seq(enumeratum)
     val jwt   = Seq(config, bcprov)
   }
 
