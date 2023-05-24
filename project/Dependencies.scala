@@ -11,7 +11,6 @@ object Dependencies {
     val config             = "1.4.2"
     val cats               = "2.9.0"
     val bcprov             = "1.73"
-    val jackson            = "2.15.0"
     val logbackClassic     = "1.4.5"
     val scalaLogging       = "3.9.5"
     val refined            = "0.10.3"
@@ -53,15 +52,14 @@ object Dependencies {
   }
 
   object Utils {
-    val config     = "com.typesafe"               % "config"           % Versions.config
-    val cats       = "org.typelevel"             %% "cats-core"        % Versions.cats
-    val bcprov     = "org.bouncycastle"           % "bcprov-jdk18on"   % Versions.bcprov
-    val jackson    = "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jackson
-    val guava      = "com.google.guava"           % "guava"            % Versions.guava
-    val enumeratum = "com.beachape"              %% "enumeratum"       % Versions.enumeratum
+    val config     = "com.typesafe"     % "config"         % Versions.config
+    val cats       = "org.typelevel"   %% "cats-core"      % Versions.cats
+    val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
+    val guava      = "com.google.guava" % "guava"          % Versions.guava
+    val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
     val juror = Seq(guava, enumeratum)
-    val jwt   = Seq(config, cats, bcprov, jackson)
+    val jwt   = Seq(config, cats, bcprov)
     val csrf  = Seq(config, cats)
   }
 
