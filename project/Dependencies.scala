@@ -4,7 +4,7 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val scalaTest          = "3.2.15"
+    val scalaTest          = "3.2.16"
     val scalaTestPlusCheck = "3.2.11.0"
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
