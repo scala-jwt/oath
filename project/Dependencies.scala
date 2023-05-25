@@ -12,7 +12,7 @@ object Dependencies {
     val bcprov             = "1.73"
     val refined            = "0.10.3"
     val circe              = "0.14.5"
-    val jsoniterScala      = "2.23.0"
+    val jsoniterScala      = "2.23.1"
     val enumeratum         = "1.7.2"
   }
 
