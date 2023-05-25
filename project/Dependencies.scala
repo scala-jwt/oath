@@ -5,7 +5,7 @@ object Dependencies {
 
   object Versions {
     val scalaTest          = "3.2.15"
-    val scalaTestPlusCheck = "3.2.11.0"
+    val scalaTestPlusCheck = "3.2.14.0"
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
@@ -18,7 +18,7 @@ object Dependencies {
 
   object Testing {
     val scalaTest          = "org.scalatest"     %% "scalatest"       % Versions.scalaTest          % Test
-    val scalaTestPlusCheck = "org.scalatestplus" %% "scalacheck-1-15" % Versions.scalaTestPlusCheck % Test
+    val scalaTestPlusCheck = "org.scalatestplus" %% "scalacheck-1-16" % Versions.scalaTestPlusCheck % Test
     val scalacheck         = "org.scalacheck"    %% "scalacheck"      % Versions.scalacheck         % Test
 
     val all = Seq(scalaTest, scalaTestPlusCheck, scalacheck)
