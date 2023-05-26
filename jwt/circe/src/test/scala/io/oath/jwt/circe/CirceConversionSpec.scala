@@ -14,15 +14,18 @@ import io.oath.jwt.{JwtIssuer, JwtVerifier}
 class CirceConversionSpec extends AnyWordSpecBase with CodecUtils {
 
   val verifierConfig =
-    JwtVerifierConfig(Algorithm.HMAC256("secret"),
-                      None,
-                      ProvidedWithConfig(None, None, Nil),
-                      LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(
+      Algorithm.HMAC256("secret"),
+      None,
+      ProvidedWithConfig(None, None, Nil),
+      LeewayWindowConfig(None, None, None, None),
+    )
   val issuerConfig =
     JwtIssuerConfig(
       Algorithm.HMAC256("secret"),
       None,
-      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
+      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None),
+    )
 
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)

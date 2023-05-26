@@ -15,15 +15,18 @@ import io.oath.jwt.syntax.TokenOps
 class JsoniterConversionSpec extends AnyWordSpecBase with CodecUtils {
 
   val verifierConfig =
-    JwtVerifierConfig(Algorithm.none(),
-                      None,
-                      ProvidedWithConfig(None, None, Nil),
-                      LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(
+      Algorithm.none(),
+      None,
+      ProvidedWithConfig(None, None, Nil),
+      LeewayWindowConfig(None, None, None, None),
+    )
   val issuerConfig =
     JwtIssuerConfig(
       Algorithm.none(),
       None,
-      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None))
+      RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None),
+    )
 
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)
