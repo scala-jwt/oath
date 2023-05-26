@@ -5,7 +5,7 @@ ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
-ThisBuild / tlBaseVersion := "0.3"
+ThisBuild / tlBaseVersion := "0.4"
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
   tlGitHubDev("andrewrigas", "Andreas Rigas")
