@@ -1,14 +1,13 @@
 package io.oath.jwt.config
 
-import java.io.{File, FileReader}
-import java.security.interfaces.{ECPrivateKey, ECPublicKey, RSAPrivateKey, RSAPublicKey}
-import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
-import java.security.{KeyFactory, PrivateKey, PublicKey}
-
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.Config
 import org.bouncycastle.util.io.pem.PemReader
 
+import java.io.{File, FileReader}
+import java.security.interfaces._
+import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
+import java.security.{KeyFactory, PrivateKey, PublicKey}
 import scala.util.Using
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -28,8 +27,9 @@ object AlgorithmLoader {
   private def loadSecretKeyOrThrow(algorithmScoped: Config): String =
     algorithmScoped.getString(SecretKeyConfigValue)
 
-  private def loadRSAKeyOrThrow(algorithmScoped: Config,
-                                forIssuing: Boolean
+  private def loadRSAKeyOrThrow(
+      algorithmScoped: Config,
+      forIssuing: Boolean,
   ): (Option[RSAPrivateKey], Option[RSAPublicKey]) =
     if (forIssuing) {
       val privateKey: RSAPrivateKey = loadPrivateKey(algorithmScoped, RSAKeyFactory)
@@ -43,8 +43,9 @@ object AlgorithmLoader {
       (None, Some(publicKey))
     }
 
-  private def loadECKeyOrThrow(algorithmScoped: Config,
-                               forIssuing: Boolean
+  private def loadECKeyOrThrow(
+      algorithmScoped: Config,
+      forIssuing: Boolean,
   ): (Option[ECPrivateKey], Option[ECPublicKey]) =
     if (forIssuing) {
       val privateKey: ECPrivateKey = loadPrivateKey(algorithmScoped, ECKeyFactory)
@@ -68,7 +69,8 @@ object AlgorithmLoader {
             .pipe(new X509EncodedKeySpec(_))
             .pipe(keyFactory.generatePublic)
         }.toEither.left
-          .map(error => s"public key pem file error [${error.getMessage}]"))
+          .map(error => s"public key pem file error [${error.getMessage}]")
+      )
 
   private def loadPrivateKey(signatureScoped: Config, keyFactory: KeyFactory): Either[String, PrivateKey] =
     signatureScoped
@@ -80,9 +82,10 @@ object AlgorithmLoader {
             .pipe(new PKCS8EncodedKeySpec(_))
             .pipe(keyFactory.generatePrivate)
         }.toEither.left
-          .map(error => s"private key pem file: ${error.getMessage}"))
+          .map(error => s"private key pem file: ${error.getMessage}")
+      )
 
-  private[config] def loadOrThrow(algorithmScoped: Config, forIssuing: Boolean): Algorithm = {
+  private[config] def loadOrThrow(algorithmScoped: Config, isIssuer: Boolean): Algorithm = {
     val algorithm = algorithmScoped.getString("name")
     algorithm.trim.toUpperCase match {
       case "HS256" =>
@@ -92,22 +95,22 @@ object AlgorithmLoader {
       case "HS512" =>
         loadSecretKeyOrThrow(algorithmScoped).pipe(Algorithm.HMAC512)
       case "RS256" =>
-        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.RSA256(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "RS384" =>
-        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.RSA384(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "RS512" =>
-        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadRSAKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.RSA512(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "ES256" =>
-        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.ECDSA256(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "ES384" =>
-        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.ECDSA384(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "ES512" =>
-        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, forIssuing)
+        val (maybePrivateKey, maybePublicKey) = loadECKeyOrThrow(algorithmScoped, isIssuer)
         Algorithm.ECDSA512(maybePublicKey.orNull, maybePrivateKey.orNull)
       case "NONE" => Algorithm.none()
       case _ =>
