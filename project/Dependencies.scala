@@ -10,9 +10,8 @@ object Dependencies {
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
     val bcprov             = "1.73"
-    val refined            = "0.10.3"
     val circe              = "0.14.5"
-    val jsoniterScala      = "2.23.0"
+    val jsoniterScala      = "2.23.1"
     val enumeratum         = "1.7.2"
   }
 
@@ -40,13 +39,6 @@ object Dependencies {
     val all = Seq(core, macros)
   }
 
-  object Refined {
-    val core       = "eu.timepit" %% "refined"            % Versions.refined
-    val scalacheck = "eu.timepit" %% "refined-scalacheck" % Versions.refined % Test
-
-    val all = Seq(core, scalacheck)
-  }
-
   object Utils {
     val config     = "com.typesafe"     % "config"         % Versions.config
     val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
@@ -63,7 +55,7 @@ object Dependencies {
   }
 
   lazy val jwtCore =
-    libraryDependencies ++= Testing.all ++ Refined.all ++ Auth0.all ++ Utils.jwt ++ Circe.all.map(_ % Test)
+    libraryDependencies ++= Testing.all ++ Auth0.all ++ Utils.jwt ++ Circe.all.map(_ % Test)
 
   lazy val jwtCirce =
     libraryDependencies ++= Circe.all

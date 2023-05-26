@@ -1,10 +1,9 @@
 package io.oath.jwt.utils
 
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.model.JwtVerifyError
+
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-
 import scala.util.control.Exception.allCatch
 
 object DecryptionUtils {
@@ -22,16 +21,13 @@ object DecryptionUtils {
     data
   }
 
-  private[oath] def decryptAES(message: NonEmptyString,
-                               secret: NonEmptyString
-  ): Either[JwtVerifyError.DecryptionError, NonEmptyString] =
+  private[oath] def decryptAES(message: String, secret: String): Either[JwtVerifyError.DecryptionError, String] =
     allCatch.withTry {
-      val raw           = java.util.Arrays.copyOf(secret.value.getBytes(UTF8), 16)
+      val raw           = java.util.Arrays.copyOf(secret.getBytes(UTF8), 16)
       val secretKeySpec = new SecretKeySpec(raw, AES)
       val cipher        = Cipher.getInstance(AES)
       cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
-      val decryptedMessage = new String(cipher.doFinal(hexStringToByte(message.value)))
-      NonEmptyString.unsafeFrom(decryptedMessage)
+      new String(cipher.doFinal(hexStringToByte(message)))
     }.toEither.left.map(e => JwtVerifyError.DecryptionError(e.getMessage))
 
 }

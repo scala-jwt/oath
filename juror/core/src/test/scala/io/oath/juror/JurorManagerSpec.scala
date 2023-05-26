@@ -23,10 +23,10 @@ class JurorManagerSpec extends AnyWordSpecBase {
       val activationEmailToken = activationEmailTokenManager.issueJwt().value.token
       val forgotPasswordToken  = forgotPasswordTokenManager.issueJwt().value.token
 
-      accessTokenManager.verifyJwt(accessToken.value.toToken).isRight shouldBe true
-      refreshTokenManager.verifyJwt(refreshToken.value.toToken).isRight shouldBe true
-      activationEmailTokenManager.verifyJwt(activationEmailToken.value.toToken).isRight shouldBe true
-      forgotPasswordTokenManager.verifyJwt(forgotPasswordToken.value.toToken).isRight shouldBe true
+      accessTokenManager.verifyJwt(accessToken.toToken).isRight shouldBe true
+      refreshTokenManager.verifyJwt(refreshToken.toToken).isRight shouldBe true
+      activationEmailTokenManager.verifyJwt(activationEmailToken.toToken).isRight shouldBe true
+      forgotPasswordTokenManager.verifyJwt(forgotPasswordToken.toToken).isRight shouldBe true
     }
   }
 
