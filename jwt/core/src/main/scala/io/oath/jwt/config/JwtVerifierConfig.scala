@@ -7,23 +7,26 @@ import io.oath.jwt.config.JwtVerifierConfig._
 
 import scala.concurrent.duration.FiniteDuration
 
-final case class JwtVerifierConfig(algorithm: Algorithm,
-                                   encrypt: Option[EncryptConfig],
-                                   providedWith: ProvidedWithConfig,
-                                   leewayWindow: LeewayWindowConfig
+final case class JwtVerifierConfig(
+    algorithm: Algorithm,
+    encrypt: Option[EncryptConfig],
+    providedWith: ProvidedWithConfig,
+    leewayWindow: LeewayWindowConfig,
 )
 
 object JwtVerifierConfig {
 
-  final case class ProvidedWithConfig(issuerClaim: Option[String] = None,
-                                      subjectClaim: Option[String] = None,
-                                      audienceClaims: Seq[String] = Seq.empty
+  final case class ProvidedWithConfig(
+      issuerClaim: Option[String]  = None,
+      subjectClaim: Option[String] = None,
+      audienceClaims: Seq[String]  = Seq.empty,
   )
 
-  final case class LeewayWindowConfig(leeway: Option[FiniteDuration] = None,
-                                      issuedAt: Option[FiniteDuration] = None,
-                                      expiresAt: Option[FiniteDuration] = None,
-                                      notBefore: Option[FiniteDuration] = None
+  final case class LeewayWindowConfig(
+      leeway: Option[FiniteDuration]    = None,
+      issuedAt: Option[FiniteDuration]  = None,
+      expiresAt: Option[FiniteDuration] = None,
+      notBefore: Option[FiniteDuration] = None,
   )
 
   private val VerifierConfigLocation     = "verifier"
@@ -49,27 +52,29 @@ object JwtVerifierConfig {
 
   def none(): JwtVerifierConfig = JwtVerifierConfig(Algorithm.none(), None, ProvidedWithConfig(), LeewayWindowConfig())
 
-  def loadOrThrow(config: Config): JwtVerifierConfig = {
-    val maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
-    val algorithm = AlgorithmLoader.loadOrThrow(config.getConfig(AlgorithmConfigLocation), forIssuing = false)
-    val encrypt   = config.getMaybeConfig(EncryptConfigLocation).map(EncryptionLoader.loadOrThrow)
-    val providedWith =
-      for {
-        verificationScoped <- maybeVerificationScoped
-        providedWithScoped <- verificationScoped.getMaybeConfig(ProvidedWithConfigLocation)
-      } yield loadOrdThrowProvidedWithConfig(providedWithScoped)
-
-    val leewayWindow =
-      for {
-        verificationScoped <- maybeVerificationScoped
-        leewayWindowScoped <- verificationScoped.getMaybeConfig(LeewayWindowConfigLocation)
-      } yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
-
-    JwtVerifierConfig(algorithm,
-                      encrypt,
-                      providedWith.getOrElse(ProvidedWithConfig()),
-                      leewayWindow.getOrElse(LeewayWindowConfig()))
-  }
+  def loadOrThrow(config: Config): JwtVerifierConfig =
+    (for {
+      algorithmScoped <- config.getMaybeConfig(AlgorithmConfigLocation)
+      algorithmConfig         = AlgorithmLoader.loadOrThrow(algorithmScoped, isIssuer = false)
+      maybeEncryptionScoped   = config.getMaybeConfig(EncryptConfigLocation)
+      maybeEncryptConfig      = maybeEncryptionScoped.map(EncryptionLoader.loadOrThrow)
+      maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
+      maybeProvidedWithConfig =
+        for {
+          verificationScoped <- maybeVerificationScoped
+          providedWithScoped <- verificationScoped.getMaybeConfig(ProvidedWithConfigLocation)
+        } yield loadOrdThrowProvidedWithConfig(providedWithScoped)
+      maybeLeewayWindowConfig =
+        for {
+          verificationScoped <- maybeVerificationScoped
+          leewayWindowScoped <- verificationScoped.getMaybeConfig(LeewayWindowConfigLocation)
+        } yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
+    } yield JwtVerifierConfig(
+      algorithmConfig,
+      maybeEncryptConfig,
+      maybeProvidedWithConfig.getOrElse(ProvidedWithConfig()),
+      maybeLeewayWindowConfig.getOrElse(LeewayWindowConfig()),
+    )).getOrElse(none())
 
   def loadOrThrow(location: String): JwtVerifierConfig = {
     val configLocation = ConfigFactory.load().getConfig(location)

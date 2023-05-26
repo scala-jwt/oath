@@ -7,7 +7,6 @@ import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
 class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
   "JwtManager" should {
-
     "be able to issue and verify jwt tokens without claims" in forAll { config: JwtManagerConfig =>
       val jwtManager = new JwtManager(config)
 

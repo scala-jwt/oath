@@ -18,7 +18,6 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
   "VerifierLoader" should {
-
     "load default-token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
@@ -40,8 +39,8 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe empty
-      config.providedWith.issuerClaim shouldBe "issuer"
-      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.issuerClaim shouldBe Some("issuer")
+      config.providedWith.subjectClaim shouldBe Some("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some
@@ -55,8 +54,8 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe Some(EncryptConfig("password"))
-      config.providedWith.issuerClaim shouldBe "issuer"
-      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.issuerClaim shouldBe Some("issuer")
+      config.providedWith.subjectClaim shouldBe Some("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some
@@ -69,8 +68,8 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val config = JwtVerifierConfig.loadOrThrow(TokenConfigLocation)
 
       config.encrypt shouldBe empty
-      config.providedWith.issuerClaim shouldBe "issuer"
-      config.providedWith.subjectClaim shouldBe "subject"
+      config.providedWith.issuerClaim shouldBe Some("issuer")
+      config.providedWith.subjectClaim shouldBe Some("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.leewayWindow.leeway shouldBe 1.minute.some
       config.leewayWindow.issuedAt shouldBe 4.minutes.some

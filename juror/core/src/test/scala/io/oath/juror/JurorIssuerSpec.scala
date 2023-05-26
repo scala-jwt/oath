@@ -16,10 +16,10 @@ class JurorIssuerSpec extends AnyWordSpecBase {
       val forgotPasswordTokenIssuer: JwtIssuer[JurorToken.ForgotPasswordToken.type] =
         jurorIssuer.as(JurorToken.ForgotPasswordToken)
 
-      accessTokenIssuer.issueJwt().value.claims.registered.iss shouldBe "access-token"
-      refreshTokenIssuer.issueJwt().value.claims.registered.iss shouldBe "refresh-token"
-      activationEmailTokenIssuer.issueJwt().value.claims.registered.iss shouldBe "activation-email-token"
-      forgotPasswordTokenIssuer.issueJwt().value.claims.registered.iss shouldBe "forgot-password-token"
+      accessTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("access-token")
+      refreshTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("refresh-token")
+      activationEmailTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("activation-email-token")
+      forgotPasswordTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("forgot-password-token")
     }
   }
 }

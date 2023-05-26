@@ -1,9 +1,9 @@
 package io.oath.jwt.utils
 
 import io.oath.jwt.model.JwtIssueError
+
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-
 import scala.util.control.Exception.allCatch
 
 object EncryptionUtils {
@@ -16,7 +16,7 @@ object EncryptionUtils {
     var j        = 0
     while (j < bytes.length) {
       val v = bytes(j) & 0xff
-      hexChars(j * 2) = HexArray(v >>> 4)
+      hexChars(j * 2)     = HexArray(v >>> 4)
       hexChars(j * 2 + 1) = HexArray(v & 0x0f)
       j += 1
     }

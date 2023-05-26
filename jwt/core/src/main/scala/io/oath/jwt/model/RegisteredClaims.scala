@@ -3,13 +3,13 @@ package io.oath.jwt.model
 import java.time.Instant
 
 final case class RegisteredClaims(
-    iss: Option[String] = None,
-    sub: Option[String] = None,
-    aud: Seq[String] = Seq.empty,
+    iss: Option[String]  = None,
+    sub: Option[String]  = None,
+    aud: Seq[String]     = Seq.empty,
     exp: Option[Instant] = None,
     nbf: Option[Instant] = None,
     iat: Option[Instant] = None,
-    jti: Option[String] = None
+    jti: Option[String]  = None,
 )
 
 object RegisteredClaims {

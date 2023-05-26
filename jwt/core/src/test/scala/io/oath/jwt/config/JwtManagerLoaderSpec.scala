@@ -12,13 +12,12 @@ class JwtManagerLoaderSpec extends AnyWordSpecBase {
   val TokenConfigLocation = "token"
 
   "ManagerLoader" should {
-
     "load default-token verifier config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
       val config       = JwtManagerConfig.loadOrThrow(configLoader)
 
-      config.issuer.registered.issuerClaim shouldBe "issuer"
-      config.issuer.registered.subjectClaim shouldBe "subject"
+      config.issuer.registered.issuerClaim shouldBe Some("issuer")
+      config.issuer.registered.subjectClaim shouldBe Some("subject")
       config.issuer.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.issuer.registered.includeIssueAtClaim shouldBe true
       config.issuer.registered.includeJwtIdClaim shouldBe false
@@ -26,8 +25,8 @@ class JwtManagerLoaderSpec extends AnyWordSpecBase {
       config.issuer.registered.notBeforeOffset shouldBe 1.minute.some
       config.issuer.algorithm.getName shouldBe "RS256"
 
-      config.verifier.providedWith.issuerClaim shouldBe "issuer"
-      config.verifier.providedWith.subjectClaim shouldBe "subject"
+      config.verifier.providedWith.issuerClaim shouldBe Some("issuer")
+      config.verifier.providedWith.subjectClaim shouldBe Some("subject")
       config.verifier.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
       config.verifier.leewayWindow.leeway shouldBe 1.minute.some
       config.verifier.leewayWindow.issuedAt shouldBe 4.minutes.some
@@ -36,5 +35,4 @@ class JwtManagerLoaderSpec extends AnyWordSpecBase {
       config.verifier.algorithm.getName shouldBe "RS256"
     }
   }
-
 }

@@ -27,9 +27,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
     .build()
 
   "JwtIssuer" should {
-
     "issue jwt tokens" when {
-
       "issue token with predefine configure claims" in forAll { config: JwtIssuerConfig =>
         val now       = getInstantNowSeconds
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
@@ -52,10 +50,12 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           Option(decodedJWT.getId) shouldBe empty
 
         Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe config.registered.expiresAtOffset.map(offset =>
-          now.plusSeconds(offset.toSeconds))
+          now.plusSeconds(offset.toSeconds)
+        )
 
         Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe config.registered.notBeforeOffset.map(offset =>
-          now.plusSeconds(offset.toSeconds))
+          now.plusSeconds(offset.toSeconds)
+        )
       }
 
       "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
@@ -71,10 +71,12 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val expectedIssuedAt = registeredClaims.iat orElse Option.when(config.registered.includeIssueAtClaim)(now)
           val expectedExpiredAt =
             registeredClaims.exp orElse config.registered.expiresAtOffset.map(offset =>
-              now.plusSeconds(offset.toSeconds))
+              now.plusSeconds(offset.toSeconds)
+            )
           val expectedNotBefore =
             registeredClaims.nbf orElse config.registered.notBeforeOffset.map(offset =>
-              now.plusSeconds(offset.toSeconds))
+              now.plusSeconds(offset.toSeconds)
+            )
 
           jwtClaims.claims.registered.iss shouldBe expectedIssuer
           jwtClaims.claims.registered.sub shouldBe expectedSubject
@@ -90,7 +92,29 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           else jwtClaims.claims.registered.jti shouldBe empty
       }
 
-      "issue token with registered claims when decoded should have the same values with the return registered claims" in forAll {
+      "issue token with only registered claims empty strings" in forAll {
+        (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
+          val now = getInstantNowSeconds
+          val adHocRegisteredClaims =
+            registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
+          val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
+          val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
+
+          val decodedJWT = jwtVerifier.verify(jwtClaims.token)
+
+          Option(decodedJWT.getIssuer) shouldBe jwtClaims.claims.registered.iss
+          Option(decodedJWT.getSubject) shouldBe jwtClaims.claims.registered.sub
+          Option(decodedJWT.getAudience)
+            .map(_.asScala.toSeq)
+            .sequence
+            .flatten shouldBe jwtClaims.claims.registered.aud
+          Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe jwtClaims.claims.registered.iat
+          Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
+          Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe jwtClaims.claims.registered.exp
+          Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe jwtClaims.claims.registered.nbf
+      }
+
+      "issue token with only registered claims when decoded should have the same values with the return registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now = getInstantNowSeconds
           val adHocRegisteredClaims =
@@ -182,14 +206,14 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val (headerResult, payloadResult) = jwtVerifier
             .verify(jwt.token)
             .pipe(decodedJwt =>
-              base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value)
+              base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value
+            )
             .pipe { case (headerJson, payloadJson) =>
               (nestedHeaderDecoder.decode(headerJson).value, nestedPayloadDecoder.decode(payloadJson).value)
             }
 
           headerResult shouldBe header
           payloadResult shouldBe payload
-
       }
 
       "issue token with header & payload claims encrypted" in forAll {

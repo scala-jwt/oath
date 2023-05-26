@@ -1,9 +1,9 @@
 package io.oath.jwt.utils
 
 import io.oath.jwt.model.JwtVerifyError
+
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-
 import scala.util.control.Exception.allCatch
 
 object DecryptionUtils {

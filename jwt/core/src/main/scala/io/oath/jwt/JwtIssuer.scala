@@ -1,16 +1,15 @@
 package io.oath.jwt
 
-import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant}
-import java.util.UUID
-
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.{JWT, JWTCreator}
 import io.oath.jwt.config.JwtIssuerConfig
-import io.oath.jwt.model.{Jwt, JwtClaims, JwtIssueError, RegisteredClaims}
+import io.oath.jwt.model._
 import io.oath.jwt.utils._
 
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant}
+import java.util.UUID
 import scala.util.control.Exception.allCatch
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -34,16 +33,19 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       sub = adHocRegisteredClaims.sub orElse config.registered.subjectClaim,
       aud = if (adHocRegisteredClaims.aud.isEmpty) config.registered.audienceClaims else adHocRegisteredClaims.aud,
       exp = adHocRegisteredClaims.exp orElse config.registered.expiresAtOffset.map(duration =>
-        now.plusSeconds(duration.toSeconds)),
+        now.plusSeconds(duration.toSeconds)
+      ),
       nbf = adHocRegisteredClaims.nbf orElse config.registered.notBeforeOffset.map(duration =>
-        now.plusSeconds(duration.toSeconds)),
+        now.plusSeconds(duration.toSeconds)
+      ),
       iat = adHocRegisteredClaims.iat orElse Option.when(config.registered.includeIssueAtClaim)(now),
       jti = adHocRegisteredClaims.jti orElse Option
         .when(config.registered.includeJwtIdClaim)(
           config.registered.issuerClaim
             .map(_ + "-")
             .getOrElse("")
-            .pipe(prefix => prefix + UUID.randomUUID().toString))
+            .pipe(prefix => prefix + UUID.randomUUID().toString)
+        ),
     )
   }
 
@@ -52,7 +54,8 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       .map(encryptConfig =>
         EncryptionUtils
           .encryptAES(jwt.token, encryptConfig.secret)
-          .map(token => jwt.copy(token = token)))
+          .map(token => jwt.copy(token = token))
+      )
       .getOrElse(Right(jwt))
 
   private def safeSign(builder: JWTCreator.Builder, algorithm: Algorithm): Either[JwtIssueError, String] =
@@ -73,8 +76,9 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
           .map(token =>
             Jwt(
               JwtClaims.Claims(registeredClaims),
-              token
-            ))
+              token,
+            )
+          )
       }
       .flatMap(encryptJwt)
   }
@@ -90,7 +94,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       token <- safeSign(builder, config.algorithm)
       jwt = Jwt(
         claims.copy(registered = registeredClaims),
-        token
+        token,
       )
       encryptedJwt <- encryptJwt(jwt)
     } yield encryptedJwt
@@ -107,7 +111,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       token <- safeSign(builder, config.algorithm)
       jwt = Jwt(
         claims.copy(registered = registeredClaims),
-        token
+        token,
       )
       encryptedJwt <- encryptJwt(jwt)
     } yield encryptedJwt
@@ -115,7 +119,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
 
   def issueJwt[H, P](claims: JwtClaims.ClaimsHP[H, P])(implicit
       headerClaimsEncoder: ClaimsEncoder[H],
-      payloadClaimsEncoder: ClaimsEncoder[P]
+      payloadClaimsEncoder: ClaimsEncoder[P],
   ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsHP[H, P]]] = {
     val jwtBuilder = JWT.create()
     for {
@@ -126,7 +130,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       token <- safeSign(builder, config.algorithm)
       jwt = Jwt(
         claims.copy(registered = registeredClaims),
-        token
+        token,
       )
       encryptedJwt <- encryptJwt(jwt)
     } yield encryptedJwt

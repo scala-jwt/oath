@@ -18,10 +18,12 @@ import scala.util.chaining.scalaUtilChainingOps
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper with CodecUtils {
 
   val defaultConfig =
-    JwtVerifierConfig(Algorithm.none(),
-                      None,
-                      ProvidedWithConfig(None, None, Nil),
-                      LeewayWindowConfig(None, None, None, None))
+    JwtVerifierConfig(
+      Algorithm.none(),
+      None,
+      ProvidedWithConfig(None, None, Nil),
+      LeewayWindowConfig(None, None, None, None),
+    )
 
   def setRegisteredClaims(builder: JWTCreator.Builder, config: JwtVerifierConfig): TestData = {
     val now       = getInstantNowSeconds
@@ -37,10 +39,10 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       expiresAt orElse leeway,
       notBefore orElse leeway,
       issueAt orElse leeway,
-      None
+      None,
     )
 
-    val builderWithRefistered = builder
+    val builderWithRegistered = builder
       .tap(builder => registeredClaims.iss.map(str => builder.withIssuer(str)))
       .tap(builder => registeredClaims.sub.map(str => builder.withSubject(str)))
       .tap(builder => builder.withAudience(registeredClaims.aud: _*))
@@ -48,11 +50,10 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       .tap(builder => registeredClaims.nbf.map(builder.withNotBefore))
       .tap(builder => registeredClaims.iat.map(builder.withIssuedAt))
 
-    TestData(registeredClaims, builderWithRefistered)
+    TestData(registeredClaims, builderWithRegistered)
   }
 
   "JwtVerifier" should {
-
     "verify token with prerequisite configurations" in forAll { config: JwtVerifierConfig =>
       val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
@@ -80,22 +81,20 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "verify a token with header that is encrypted" in forAll {
-      (nestedHeader: NestedHeader, config: JwtVerifierConfig) =>
-        whenever(config.encrypt.nonEmpty) {
-          val jwtVerifier = new JwtVerifier(config)
+      (nestedHeader: NestedHeader, config: JwtVerifierConfig, encryptConfig: EncryptConfig) =>
+        val jwtVerifier = new JwtVerifier(config.copy(encrypt = Some(encryptConfig)))
 
-          val testData = setRegisteredClaims(JWT.create(), config)
+        val testData = setRegisteredClaims(JWT.create(), config)
 
-          val token = testData.builder
-            .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
-            .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
-            .value
+        val token = testData.builder
+          .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
+          .sign(config.algorithm)
+          .pipe(token => EncryptionUtils.encryptAES(token, encryptConfig.secret))
+          .value
 
-          val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
+        val verified = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
 
-          verified.value shouldBe nestedHeader.toClaimsH.copy(registered = testData.registeredClaims)
-        }
+        verified.value shouldBe nestedHeader.toClaimsH.copy(registered = testData.registeredClaims)
     }
 
     "verify a token with payload" in forAll { (nestedPayload: NestedPayload, config: JwtVerifierConfig) =>
@@ -113,22 +112,20 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "verify a token with payload that is encrypted" in forAll {
-      (nestedPayload: NestedPayload, config: JwtVerifierConfig) =>
-        whenever(config.encrypt.nonEmpty) {
-          val jwtVerifier = new JwtVerifier(config)
+      (nestedPayload: NestedPayload, config: JwtVerifierConfig, encryptConfig: EncryptConfig) =>
+        val jwtVerifier = new JwtVerifier(config.copy(encrypt = Some(encryptConfig)))
 
-          val testData = setRegisteredClaims(JWT.create(), config)
+        val testData = setRegisteredClaims(JWT.create(), config)
 
-          val token = testData.builder
-            .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
-            .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
-            .value
+        val token = testData.builder
+          .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
+          .sign(config.algorithm)
+          .pipe(token => EncryptionUtils.encryptAES(token, encryptConfig.secret))
+          .value
 
-          val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
+        val verified = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
 
-          verified.value shouldBe nestedPayload.toClaimsP.copy(registered = testData.registeredClaims)
-        }
+        verified.value shouldBe nestedPayload.toClaimsP.copy(registered = testData.registeredClaims)
     }
 
     "verify a token with header & payload" in forAll {
@@ -149,24 +146,27 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "verify a token with header & payload that is encrypted" in forAll {
-      (nestedHeader: NestedHeader, nestedPayload: NestedPayload, config: JwtVerifierConfig) =>
-        whenever(config.encrypt.nonEmpty) {
-          val jwtVerifier = new JwtVerifier(config)
+      (
+          nestedHeader: NestedHeader,
+          nestedPayload: NestedPayload,
+          config: JwtVerifierConfig,
+          encryptConfig: EncryptConfig,
+      ) =>
+        val jwtVerifier = new JwtVerifier(config.copy(encrypt = Some(encryptConfig)))
 
-          val testData = setRegisteredClaims(JWT.create(), config)
+        val testData = setRegisteredClaims(JWT.create(), config)
 
-          val token = testData.builder
-            .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
-            .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
-            .sign(config.algorithm)
-            .pipe(token => EncryptionUtils.encryptAES(token, config.encrypt.value.secret))
-            .value
+        val token = testData.builder
+          .withPayload(unsafeParseJsonToJavaMap(nestedPayloadEncoder.encode(nestedPayload)))
+          .withHeader(unsafeParseJsonToJavaMap(nestedHeaderEncoder.encode(nestedHeader)))
+          .sign(config.algorithm)
+          .pipe(token => EncryptionUtils.encryptAES(token, encryptConfig.secret))
+          .value
 
-          val verified =
-            jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
+        val verified =
+          jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
 
-          verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = testData.registeredClaims)
-        }
+        verified.value shouldBe (nestedHeader, nestedPayload).toClaimsHP.copy(registered = testData.registeredClaims)
     }
 
     "fail to verify a token that is encrypted" in {
@@ -190,7 +190,8 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       failedOutOfRangeLonger.left.value shouldBe JwtVerifyError.DecryptionError("String index out of range: 97")
       failedOutOfRangeShorter.left.value shouldBe JwtVerifyError.DecryptionError("String index out of range: 95")
       failedNotValid.left.value shouldBe JwtVerifyError.DecryptionError(
-        "Given final block not properly padded. Such issues can arise if a bad key is used during decryption.")
+        "Given final block not properly padded. Such issues can arise if a bad key is used during decryption."
+      )
     }
 
     "fail to decode a token with header" in {
@@ -327,7 +328,8 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
         verified shouldBe
           JwtVerifyError
             .SignatureVerificationError(
-              "The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA256")
+              "The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA256"
+            )
             .asLeft
     }
 

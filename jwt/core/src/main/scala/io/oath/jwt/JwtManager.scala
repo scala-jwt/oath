@@ -1,7 +1,7 @@
 package io.oath.jwt
 
 import io.oath.jwt.config.JwtManagerConfig
-import io.oath.jwt.model.{Jwt, JwtClaims, JwtIssueError, JwtToken, JwtVerifyError}
+import io.oath.jwt.model._
 
 final class JwtManager(config: JwtManagerConfig) {
 
@@ -23,7 +23,7 @@ final class JwtManager(config: JwtManagerConfig) {
 
   def issueJwt[H, P](claims: JwtClaims.ClaimsHP[H, P])(implicit
       headerClaimsEncoder: ClaimsEncoder[H],
-      payloadClaimsEncoder: ClaimsEncoder[P]
+      payloadClaimsEncoder: ClaimsEncoder[P],
   ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsHP[H, P]]] = issuer.issueJwt(claims)
 
   def verifyJwt(jwt: JwtToken.Token): Either[JwtVerifyError, JwtClaims.Claims] = verifier.verifyJwt(jwt)
@@ -38,6 +38,6 @@ final class JwtManager(config: JwtManagerConfig) {
 
   def verifyJwt[H, P](jwt: JwtToken.TokenHP)(implicit
       headerDecoder: ClaimsDecoder[H],
-      payloadDecoder: ClaimsDecoder[P]
+      payloadDecoder: ClaimsDecoder[P],
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] = verifier.verifyJwt(jwt)(headerDecoder, payloadDecoder)
 }

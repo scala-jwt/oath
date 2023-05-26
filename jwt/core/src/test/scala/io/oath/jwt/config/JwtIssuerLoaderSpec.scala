@@ -18,7 +18,6 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
   "IssuerLoader" should {
-
     "load default-token issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
@@ -39,8 +38,8 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe "issuer"
-      config.registered.subjectClaim shouldBe "subject"
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
       config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
@@ -54,8 +53,8 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe Some(EncryptConfig("password"))
-      config.registered.issuerClaim shouldBe "issuer"
-      config.registered.subjectClaim shouldBe "subject"
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
       config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
@@ -68,8 +67,8 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config = JwtIssuerConfig.loadOrThrow(TokenConfigLocation)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe "issuer"
-      config.registered.subjectClaim shouldBe "subject"
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
       config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
@@ -90,7 +89,7 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       the[IllegalArgumentException] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
 
-    "failt to load invalid-token-wrong-type issuer config values from configuration file" in {
+    "fail to load invalid-token-wrong-type issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
       the[ConfigException.BadValue] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)

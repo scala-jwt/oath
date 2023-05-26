@@ -1,13 +1,12 @@
 package io.oath.jwt
 
-import java.nio.charset.StandardCharsets
-import java.time.Instant
-import java.util.Base64
-
 import com.auth0.jwt.JWTCreator.Builder
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.oath.jwt.model.{JwtIssueError, JwtVerifyError}
 
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+import java.util.Base64
 import scala.util.control.Exception.allCatch
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
@@ -26,20 +25,17 @@ package object utils {
       .map(JwtVerifyError.DecodingError("Base64 decode failure.", _))
 
   private[oath] implicit class DecodedJWTOps(private val decodedJWT: DecodedJWT) {
-    def getOptionNonEmptyStringIssuer: Option[String] =
+    def getOptionIssuer: Option[String] =
       Option(decodedJWT.getIssuer)
-        .filter(_.nonEmpty)
 
-    def getOptionNonEmptyStringSubject: Option[String] =
+    def getOptionSubject: Option[String] =
       Option(decodedJWT.getSubject)
-        .filter(_.nonEmpty)
 
-    def getOptionNonEmptyStringID: Option[String] =
+    def getOptionJwtID: Option[String] =
       Option(decodedJWT.getId)
-        .filter(_.nonEmpty)
 
-    def getSeqNonEmptyStringAudience: Seq[String] =
-      Option(decodedJWT.getAudience).map(_.asScala).toSeq.flatMap(_.filter(_.nonEmpty))
+    def getSeqAudience: Seq[String] =
+      Option(decodedJWT.getAudience).map(_.asScala).toSeq.flatten
 
     def getOptionExpiresAt: Option[Instant] =
       Option(decodedJWT.getExpiresAt).map(_.toInstant)
@@ -55,7 +51,7 @@ package object utils {
 
     private def safeEncode[T](
         claims: T,
-        toBuilder: String => Builder
+        toBuilder: String => Builder,
     )(implicit claimsEncoder: ClaimsEncoder[T]): Either[JwtIssueError.EncodeError, Builder] =
       allCatch
         .withTry(

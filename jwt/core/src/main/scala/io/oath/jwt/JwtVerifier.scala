@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.oath.jwt.config.JwtVerifierConfig
-import io.oath.jwt.model.{JwtClaims, JwtToken, JwtVerifyError, RegisteredClaims}
+import io.oath.jwt.model._
 import io.oath.jwt.utils._
 
 import scala.util.control.Exception.allCatch
@@ -20,26 +20,31 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       .tap(jwtVerification => config.providedWith.subjectClaim.map(str => jwtVerification.withSubject(str)))
       .tap(jwtVerification =>
         if (config.providedWith.audienceClaims.nonEmpty)
-          jwtVerification.withAudience(config.providedWith.audienceClaims: _*))
+          jwtVerification.withAudience(config.providedWith.audienceClaims: _*)
+      )
       .tap(jwtVerification =>
-        config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds)))
+        config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds))
+      )
       .tap(jwtVerification =>
-        config.leewayWindow.issuedAt.map(duration => jwtVerification.acceptIssuedAt(duration.toSeconds)))
+        config.leewayWindow.issuedAt.map(duration => jwtVerification.acceptIssuedAt(duration.toSeconds))
+      )
       .tap(jwtVerification =>
-        config.leewayWindow.expiresAt.map(duration => jwtVerification.acceptExpiresAt(duration.toSeconds)))
+        config.leewayWindow.expiresAt.map(duration => jwtVerification.acceptExpiresAt(duration.toSeconds))
+      )
       .tap(jwtVerification =>
-        config.leewayWindow.notBefore.map(duration => jwtVerification.acceptNotBefore(duration.toSeconds)))
+        config.leewayWindow.notBefore.map(duration => jwtVerification.acceptNotBefore(duration.toSeconds))
+      )
       .build()
 
   private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
     RegisteredClaims(
-      iss = decodedJWT.getOptionNonEmptyStringIssuer,
-      sub = decodedJWT.getOptionNonEmptyStringSubject,
-      aud = decodedJWT.getSeqNonEmptyStringAudience,
+      iss = decodedJWT.getOptionIssuer,
+      sub = decodedJWT.getOptionSubject,
+      aud = decodedJWT.getSeqAudience,
       exp = decodedJWT.getOptionExpiresAt,
       nbf = decodedJWT.getOptionNotBefore,
       iat = decodedJWT.getOptionIssueAt,
-      jti = decodedJWT.getOptionNonEmptyStringID
+      jti = decodedJWT.getOptionJwtID,
     )
 
   private def decryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
@@ -111,7 +116,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
 
   def verifyJwt[H, P](jwt: JwtToken.TokenHP)(implicit
       headerDecoder: ClaimsDecoder[H],
-      payloadDecoder: ClaimsDecoder[P]
+      payloadDecoder: ClaimsDecoder[P],
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     for {
       token          <- validateToken(jwt.token)
