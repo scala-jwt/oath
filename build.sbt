@@ -53,6 +53,21 @@ lazy val root = Projects
   .settings(Aliases.all)
   .aggregate(modules: _*)
 
+lazy val oathCore = Projects
+  .createModule("oath-core", "modules/oath-core")
+  .settings(Dependencies.jwtCore)
+  .settings(Dependencies.juror)
+
+lazy val oathCirce = Projects
+  .createModule("oath-circe", "modules/oath-circe")
+  .settings(Dependencies.jwtCirce)
+  .dependsOn(oathCore % "compile->compile;test->test")
+
+lazy val oathJsoniterScala = Projects
+  .createModule("oath-jsoniter-scala", "modules/oath-jsoniter-scala")
+  .settings(Dependencies.jwtJsoniterScala)
+  .dependsOn(jwtCore % "compile->compile;test->test")
+
 lazy val jwtCore = Projects
   .createModule("jwt-core", "jwt/core")
   .settings(Dependencies.jwtCore)
@@ -73,6 +88,9 @@ lazy val juror = Projects
   .dependsOn(jwtCore % "compile->compile;test->test")
 
 lazy val modules: Seq[ProjectReference] = Seq(
+  oathCore,
+  oathCirce,
+  oathJsoniterScala,
   juror,
   jwtCore,
   jwtCirce,
