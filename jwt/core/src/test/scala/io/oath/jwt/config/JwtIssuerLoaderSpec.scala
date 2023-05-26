@@ -1,7 +1,6 @@
 package io.oath.jwt.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import eu.timepit.refined.types.string.NonEmptyString
 import io.oath.jwt.config.EncryptionLoader.EncryptConfig
 import io.oath.jwt.testkit.AnyWordSpecBase
 
@@ -19,7 +18,6 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
   "IssuerLoader" should {
-
     "load default-token issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
@@ -40,9 +38,9 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some
@@ -54,10 +52,10 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenWithEncryptionConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe Some(EncryptConfig(NonEmptyString.unsafeFrom("password")))
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.encrypt shouldBe Some(EncryptConfig("password"))
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some
@@ -69,9 +67,9 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val config = JwtIssuerConfig.loadOrThrow(TokenConfigLocation)
 
       config.encrypt shouldBe empty
-      config.registered.issuerClaim shouldBe NonEmptyString.unapply("issuer")
-      config.registered.subjectClaim shouldBe NonEmptyString.unapply("subject")
-      config.registered.audienceClaims shouldBe Seq("aud1", "aud2").map(NonEmptyString.unsafeFrom)
+      config.registered.issuerClaim shouldBe Some("issuer")
+      config.registered.subjectClaim shouldBe Some("subject")
+      config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
       config.registered.includeIssueAtClaim shouldBe true
       config.registered.includeJwtIdClaim shouldBe false
       config.registered.expiresAtOffset shouldBe 1.day.some
@@ -91,7 +89,7 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       the[IllegalArgumentException] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
 
-    "failt to load invalid-token-wrong-type issuer config values from configuration file" in {
+    "fail to load invalid-token-wrong-type issuer config values from configuration file" in {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
       the[ConfigException.BadValue] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)

@@ -25,7 +25,10 @@ object NestedHeader {
   implicit val nestedHeaderDecoder: ClaimsDecoder[NestedHeader] = nestedHeaderJson =>
     parse(nestedHeaderJson).left
       .map(parsingFailure => JwtVerifyError.DecodingError(parsingFailure.message, parsingFailure.underlying))
-      .flatMap(_.as[NestedHeader].left.map(decodingFailure =>
-        JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)))
+      .flatMap(
+        _.as[NestedHeader].left.map(decodingFailure =>
+          JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)
+        )
+      )
 
 }

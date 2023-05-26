@@ -38,3 +38,6 @@ val jwtCirce = "io.github.scala-jwt" %% "jwt-circe" % "0.0.0"
 ```scala
 val jwtJsoniterScala = "io.github.scala-jwt" %% "jwt-jsoniter-scala" % "0.0.0"
 ```
+
+### Known Issues
+ * Audience single empty string in the list might lead to unexpected behaviours raised in [java-jwt#662](https://github.com/auth0/java-jwt/issues/662) 

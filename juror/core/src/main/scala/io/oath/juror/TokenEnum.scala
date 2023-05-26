@@ -21,6 +21,7 @@ trait TokenEnum[A <: TokenEnumEntry] extends Enum[A] {
           FormatConversion
             .convertUpperCamelToLowerHyphen(
               convertToString(value)
-            ))
+            )
+      )
       .toMap
 }
