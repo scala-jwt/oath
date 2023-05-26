@@ -16,21 +16,21 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / githubWorkflowJavaVersions := Seq("11", "17").map(JavaSpec.temurin)
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
-    id = "checklint",
-    name = "Check code style",
+    id     = "checklint",
+    name   = "Check code style",
     scalas = List(scalaVersion.value),
     steps = List(WorkflowStep.Checkout) ++ WorkflowStep.SetupJava(
       List(githubWorkflowJavaVersions.value.last)
     ) ++ githubWorkflowGeneratedCacheSteps.value ++ List(
       WorkflowStep.Sbt(
         List("checkLint"),
-        name = Some("Check Scalafmt and Scalafix rules")
+        name = Some("Check Scalafmt and Scalafix rules"),
       )
-    )
+    ),
   ),
   WorkflowJob(
-    id = "Codecov",
-    name = "Codecov",
+    id     = "Codecov",
+    name   = "Codecov",
     scalas = List(scalaVersion.value),
     steps = List(WorkflowStep.Checkout) ++ WorkflowStep.SetupJava(
       List(githubWorkflowJavaVersions.value.last)
@@ -40,11 +40,11 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
         UseRef.Public(
           "codecov",
           "codecov-action",
-          "v3.1.1"
+          "v3.1.1",
         )
-      )
-    )
-  )
+      ),
+    ),
+  ),
 )
 
 lazy val root = Projects
@@ -76,5 +76,5 @@ lazy val modules: Seq[ProjectReference] = Seq(
   juror,
   jwtCore,
   jwtCirce,
-  jwtJsoniterScala
+  jwtJsoniterScala,
 )
