@@ -25,6 +25,9 @@ object NestedPayload {
   implicit val nestedPayloadDecoder: ClaimsDecoder[NestedPayload] = nestedPayloadJson =>
     parse(nestedPayloadJson).left
       .map(parsingFailure => JwtVerifyError.DecodingError(parsingFailure.message, parsingFailure.underlying))
-      .flatMap(_.as[NestedPayload].left.map(decodingFailure =>
-        JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)))
+      .flatMap(
+        _.as[NestedPayload].left.map(decodingFailure =>
+          JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)
+        )
+      )
 }

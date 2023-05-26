@@ -16,6 +16,6 @@ object Projects {
         scalafmtOnCompile := sys.env.getOrElse("RUN_SCALAFMT_ON_COMPILE", "false").toBoolean,
         scalafixOnCompile := sys.env.getOrElse("RUN_SCALAFIX_ON_COMPILE", "false").toBoolean,
         semanticdbEnabled := true,
-        semanticdbVersion := "4.6.0"
+        semanticdbVersion := "4.6.0",
       )
 }

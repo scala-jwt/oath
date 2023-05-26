@@ -7,12 +7,11 @@ import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
 class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
   "JwtManager" should {
-
     "be able to issue and verify jwt tokens without claims" in forAll { config: JwtManagerConfig =>
       val jwtManager = new JwtManager(config)
 
       val jwt = jwtManager.issueJwt().value
-      jwtManager.verifyJwt(jwt.token.value.toToken).value.registered shouldBe jwt.claims.registered
+      jwtManager.verifyJwt(jwt.token.toToken).value.registered shouldBe jwt.claims.registered
     }
 
     "be able to issue and verify jwt tokens with header claims" in forAll {
@@ -21,7 +20,7 @@ class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
         val claims = nestedHeader.toClaimsH
         val jwt    = jwtManager.issueJwt(claims).value
-        jwtManager.verifyJwt[NestedHeader](jwt.token.value.toTokenH).value shouldBe claims
+        jwtManager.verifyJwt[NestedHeader](jwt.token.toTokenH).value shouldBe claims
           .copy(registered = jwt.claims.registered)
     }
 
@@ -31,7 +30,7 @@ class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
         val claims = nestedPayload.toClaimsP
         val jwt    = jwtManager.issueJwt(claims).value
-        jwtManager.verifyJwt[NestedPayload](jwt.token.value.toTokenP).value shouldBe claims
+        jwtManager.verifyJwt[NestedPayload](jwt.token.toTokenP).value shouldBe claims
           .copy(registered = jwt.claims.registered)
     }
 
@@ -41,7 +40,7 @@ class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
         val claims = (nestedHeader, nestedPayload).toClaimsHP
         val jwt    = jwtManager.issueJwt(claims).value
-        jwtManager.verifyJwt[NestedHeader, NestedPayload](jwt.token.value.toTokenHP).value shouldBe claims
+        jwtManager.verifyJwt[NestedHeader, NestedPayload](jwt.token.toTokenHP).value shouldBe claims
           .copy(registered = jwt.claims.registered)
     }
   }

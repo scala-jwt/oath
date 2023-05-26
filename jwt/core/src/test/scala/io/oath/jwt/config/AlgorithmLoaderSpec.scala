@@ -9,11 +9,10 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
   private val AlgorithmConfigLocation = "algorithm"
 
   "AlgorithmLoader" should {
-
     "load none encryption algorithm config" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-none").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer
@@ -26,8 +25,8 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
     "load RSXXX encryption algorithm with secret key" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-rsxxx").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer
@@ -40,8 +39,8 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
     "load HSXXX encryption algorithm with secret key" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-hsxxx").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer
@@ -54,8 +53,8 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
     "load ES256 encryption algorithm with secret key" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es256").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer
@@ -68,8 +67,8 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
     "load ES384 encryption algorithm with secret key" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es384").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer
@@ -82,8 +81,8 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
     "load ES512 encryption algorithm with secret key" in forAll { issuer: String =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es512").getConfig(AlgorithmConfigLocation)
-      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = true)
-      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, forIssuing = false)
+      val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
+      val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
 
       val token: String  = JWT.create().withIssuer(issuer).sign(issuingAlgorithm)
       val verifiedIssuer = JWT.require(verifyingAlgorithm).build().verify(token).getIssuer

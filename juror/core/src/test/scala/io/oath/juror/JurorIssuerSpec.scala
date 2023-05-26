@@ -1,6 +1,5 @@
 package io.oath.juror
 
-import eu.timepit.refined.types.all.NonEmptyString
 import io.oath.jwt.testkit.AnyWordSpecBase
 
 class JurorIssuerSpec extends AnyWordSpecBase {
@@ -17,12 +16,10 @@ class JurorIssuerSpec extends AnyWordSpecBase {
       val forgotPasswordTokenIssuer: JwtIssuer[JurorToken.ForgotPasswordToken.type] =
         jurorIssuer.as(JurorToken.ForgotPasswordToken)
 
-      accessTokenIssuer.issueJwt().value.claims.registered.iss shouldBe NonEmptyString.unapply("access-token")
-      refreshTokenIssuer.issueJwt().value.claims.registered.iss shouldBe NonEmptyString.unapply("refresh-token")
-      activationEmailTokenIssuer.issueJwt().value.claims.registered.iss shouldBe NonEmptyString.unapply(
-        "activation-email-token")
-      forgotPasswordTokenIssuer.issueJwt().value.claims.registered.iss shouldBe NonEmptyString.unapply(
-        "forgot-password-token")
+      accessTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("access-token")
+      refreshTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("refresh-token")
+      activationEmailTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("activation-email-token")
+      forgotPasswordTokenIssuer.issueJwt().value.claims.registered.iss shouldBe Some("forgot-password-token")
     }
   }
 }
