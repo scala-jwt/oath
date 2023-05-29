@@ -52,7 +52,7 @@ lazy val root = Projects
   .createModule("oath", ".")
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules: _*)
+  .aggregate(modules *)
 
 lazy val oathCore = Projects
   .createModule("oath-core", "modules/oath-core")
