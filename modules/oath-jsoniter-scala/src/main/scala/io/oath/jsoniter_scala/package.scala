@@ -1,0 +1,3 @@
+package io.oath
+
+package object jsoniter_scala extends JsoniterClaimsDecoderConversion with JsoniterClaimsEncoderConversion

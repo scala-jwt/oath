@@ -1,11 +1,11 @@
-import sbt.Keys._
-import sbt._
+import sbt.*
+import sbt.Keys.*
 
 object Dependencies {
 
   object Versions {
     val scalaTest          = "3.2.16"
-    val scalaTestPlusCheck = "3.2.14.0"
+    val scalaTestPlusCheck = "3.2.16.0"
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
@@ -17,7 +17,7 @@ object Dependencies {
 
   object Testing {
     val scalaTest          = "org.scalatest"     %% "scalatest"       % Versions.scalaTest          % Test
-    val scalaTestPlusCheck = "org.scalatestplus" %% "scalacheck-1-16" % Versions.scalaTestPlusCheck % Test
+    val scalaTestPlusCheck = "org.scalatestplus" %% "scalacheck-1-17" % Versions.scalaTestPlusCheck % Test
     val scalacheck         = "org.scalacheck"    %% "scalacheck"      % Versions.scalacheck         % Test
 
     val all = Seq(scalaTest, scalaTestPlusCheck, scalacheck)
@@ -44,8 +44,7 @@ object Dependencies {
     val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
     val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
 
-    val juror = Seq(enumeratum)
-    val jwt   = Seq(config, bcprov)
+    val all = Seq(config, bcprov, enumeratum)
   }
 
   object Auth0 {
@@ -54,15 +53,13 @@ object Dependencies {
     val all = Seq(javaJWT)
   }
 
-  lazy val jwtCore =
-    libraryDependencies ++= Testing.all ++ Auth0.all ++ Utils.jwt ++ Circe.all.map(_ % Test)
+  lazy val oathCore =
+    libraryDependencies ++= Testing.all ++ Auth0.all ++ Utils.all ++ Circe.all.map(_ % Test)
 
-  lazy val jwtCirce =
+  lazy val oathCirce =
     libraryDependencies ++= Circe.all
 
-  lazy val jwtJsoniterScala =
+  lazy val oathJsoniterScala =
     libraryDependencies ++= JsoniterScala.all
 
-  lazy val juror =
-    libraryDependencies ++= Utils.juror
 }

@@ -1,11 +1,13 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+ThisBuild / version := "0.1-SNAPSHOT"
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
-ThisBuild / tlBaseVersion := "0.4"
+ThisBuild / tlBaseVersion := "1.0"
+ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
   tlGitHubDev("andrewrigas", "Andreas Rigas")
@@ -51,30 +53,24 @@ lazy val root = Projects
   .createModule("oath", ".")
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules: _*)
+  .aggregate(modules *)
 
-lazy val jwtCore = Projects
-  .createModule("jwt-core", "jwt/core")
-  .settings(Dependencies.jwtCore)
+lazy val oathCore = Projects
+  .createModule("oath-core", "modules/oath-core")
+  .settings(Dependencies.oathCore)
 
-lazy val jwtCirce = Projects
-  .createModule("jwt-circe", "jwt/circe")
-  .settings(Dependencies.jwtCirce)
-  .dependsOn(jwtCore % "compile->compile;test->test")
+lazy val oathCirce = Projects
+  .createModule("oath-circe", "modules/oath-circe")
+  .settings(Dependencies.oathCirce)
+  .dependsOn(oathCore % "compile->compile;test->test")
 
-lazy val jwtJsoniterScala = Projects
-  .createModule("jwt-jsoniter-scala", "jwt/jsoniter-scala")
-  .settings(Dependencies.jwtJsoniterScala)
-  .dependsOn(jwtCore % "compile->compile;test->test")
-
-lazy val juror = Projects
-  .createModule("juror", "juror/core")
-  .settings(Dependencies.juror)
-  .dependsOn(jwtCore % "compile->compile;test->test")
+lazy val oathJsoniterScala = Projects
+  .createModule("oath-jsoniter-scala", "modules/oath-jsoniter-scala")
+  .settings(Dependencies.oathJsoniterScala)
+  .dependsOn(oathCore % "compile->compile;test->test")
 
 lazy val modules: Seq[ProjectReference] = Seq(
-  juror,
-  jwtCore,
-  jwtCirce,
-  jwtJsoniterScala,
+  oathCore,
+  oathCirce,
+  oathJsoniterScala,
 )
