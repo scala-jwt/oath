@@ -1,6 +1,5 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / version := "0.1-SNAPSHOT"
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
