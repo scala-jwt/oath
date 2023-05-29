@@ -1,0 +1,3 @@
+package io.oath
+
+package object circe extends CirceClaimsDecoderConversion with CirceClaimsEncoderConversion

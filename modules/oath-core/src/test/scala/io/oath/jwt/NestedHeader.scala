@@ -4,8 +4,9 @@ import io.circe._
 import io.circe.generic.semiauto._
 import io.circe.parser._
 import io.circe.syntax._
+import io.oath.json._
 import io.oath.jwt.NestedHeader.SimpleHeader
-import io.oath.jwt.model.JwtVerifyError
+import io.oath.model.JwtVerifyError
 
 final case class NestedHeader(name: String, mapping: Map[String, SimpleHeader])
 

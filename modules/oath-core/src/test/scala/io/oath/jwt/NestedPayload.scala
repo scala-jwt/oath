@@ -4,8 +4,9 @@ import io.circe.generic.semiauto._
 import io.circe.parser._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder}
+import io.oath.json._
 import io.oath.jwt.NestedPayload.SimplePayload
-import io.oath.jwt.model.JwtVerifyError
+import io.oath.model.JwtVerifyError
 
 final case class NestedPayload(name: String, mapping: Map[String, SimplePayload])
 

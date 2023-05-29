@@ -1,7 +1,9 @@
 package io.oath.jwt
 
-import io.oath.jwt.config.JwtManagerConfig
-import io.oath.jwt.model._
+import io.oath.config._
+import io.oath.json.{ClaimsDecoder, ClaimsEncoder}
+import io.oath.jwt.{JwtIssuer, JwtVerifier}
+import io.oath.model._
 
 final class JwtManager(config: JwtManagerConfig) {
 

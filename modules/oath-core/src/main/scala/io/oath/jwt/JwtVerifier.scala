@@ -3,9 +3,10 @@ package io.oath.jwt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions._
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.oath.jwt.config.JwtVerifierConfig
-import io.oath.jwt.model._
-import io.oath.jwt.utils._
+import io.oath.config.JwtVerifierConfig
+import io.oath.json.ClaimsDecoder
+import io.oath.model._
+import io.oath.utils._
 
 import scala.util.control.Exception.allCatch
 

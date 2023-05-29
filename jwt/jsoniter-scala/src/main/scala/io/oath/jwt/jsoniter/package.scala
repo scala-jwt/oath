@@ -1,3 +1,0 @@
-package io.oath.jwt
-
-package object jsoniter extends JsoniterClaimsDecoderConversion with JsoniterClaimsEncoderConversion

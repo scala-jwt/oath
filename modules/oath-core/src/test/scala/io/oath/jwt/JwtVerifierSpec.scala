@@ -2,17 +2,19 @@ package io.oath.jwt
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.{JWT, JWTCreator}
+import io.oath.JwtVerifier
+import io.oath.config.EncryptionLoader.EncryptConfig
+import io.oath.config.JwtVerifierConfig
+import io.oath.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
-import io.oath.jwt.config.EncryptionLoader.EncryptConfig
-import io.oath.jwt.config.JwtVerifierConfig
-import io.oath.jwt.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.jwt.model.{JwtVerifyError, RegisteredClaims}
-import io.oath.jwt.syntax._
-import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
-import io.oath.jwt.utils._
+import io.oath.model.{JwtVerifyError, RegisteredClaims}
+import io.oath.testkit.{AnyWordSpecBase, PropertyBasedTesting}
+import io.oath.utils._
 
-import cats.implicits.catsSyntaxEitherId
+import io.oath.syntax.SingleValueClaimsOps
+import io.oath.syntax.TokenOps
+import io.oath.syntax.TupleValueClaimsOps
 import scala.util.chaining.scalaUtilChainingOps
 
 class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with ClockHelper with CodecUtils {
@@ -284,7 +286,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val verified = jwtVerifier.verifyJwt(token.toToken)
 
-      verified shouldBe JwtVerifyError.VerificationError("The Claim 'iss' is not present in the JWT.").asLeft
+      verified.left.value shouldBe JwtVerifyError.VerificationError("The Claim 'iss' is not present in the JWT.")
     }
 
     "fail to verify token with IllegalArgument when null algorithm is provided" in forAll { config: JwtVerifierConfig =>
@@ -296,7 +298,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val verified = jwtVerifier.verifyJwt(token.toToken)
 
-      verified shouldBe JwtVerifyError.IllegalArgument("The Algorithm cannot be null.").asLeft
+      verified.left.value shouldBe JwtVerifyError.IllegalArgument("The Algorithm cannot be null.")
     }
 
     "fail to verify token with AlgorithmMismatch when jwt header algorithm doesn't match with verify" in forAll {
@@ -309,10 +311,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
         val verified = jwtVerifier.verifyJwt(token.toToken)
 
-        verified shouldBe
+        verified.left.value shouldBe
           JwtVerifyError
             .AlgorithmMismatch("The provided Algorithm doesn't match the one defined in the JWT's Header.")
-            .asLeft
     }
 
     "fail to verify token with SignatureVerificationError when secrets provided are wrong" in forAll {
@@ -325,12 +326,11 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
         val verified = jwtVerifier.verifyJwt(token.toToken)
 
-        verified shouldBe
+        verified.left.value shouldBe
           JwtVerifyError
             .SignatureVerificationError(
               "The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA256"
             )
-            .asLeft
     }
 
     "fail to verify token with TokenExpired when JWT expires" in {
@@ -344,10 +344,9 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
 
       val verified = jwtVerifier.verifyJwt(token.toToken)
 
-      verified shouldBe
+      verified.left.value shouldBe
         JwtVerifyError
           .TokenExpired(s"The Token has expired on $expiresAt.")
-          .asLeft
     }
 
     "fail to verify an empty string token" in {

@@ -2,19 +2,17 @@ package io.oath.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import io.oath.JwtIssuer
+import io.oath.config.JwtIssuerConfig
 import io.oath.jwt.NestedHeader._
 import io.oath.jwt.NestedPayload._
-import io.oath.jwt.config.JwtIssuerConfig
-import io.oath.jwt.model.{JwtIssueError, RegisteredClaims}
-import io.oath.jwt.syntax._
-import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
-import io.oath.jwt.utils._
+import io.oath.model._
+import io.oath.syntax._
+import io.oath.testkit._
+import io.oath.utils.{ClockHelper, base64DecodeToken}
 
 import scala.util.Try
 
-import cats.implicits.catsSyntaxEitherId
-import cats.implicits.catsSyntaxOptionId
-import cats.implicits.toTraverseOps
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.chaining.scalaUtilChainingOps
@@ -39,7 +37,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         Option(decodedJWT.getSubject) shouldBe config.registered.subjectClaim
         Option(decodedJWT.getAudience)
           .map(_.asScala.toSeq)
-          .sequence
+          .toSeq
           .flatten shouldBe config.registered.audienceClaims
 
         Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe Option.when(config.registered.includeIssueAtClaim)(now)
@@ -96,7 +94,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now = getInstantNowSeconds
           val adHocRegisteredClaims =
-            registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
+            registeredClaims.copy(iat = Some(now), exp = Some(now.plusSeconds(5.minutes.toSeconds)), nbf = Some(now))
           val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
           val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
@@ -106,7 +104,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           Option(decodedJWT.getSubject) shouldBe jwtClaims.claims.registered.sub
           Option(decodedJWT.getAudience)
             .map(_.asScala.toSeq)
-            .sequence
+            .toSeq
             .flatten shouldBe jwtClaims.claims.registered.aud
           Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe jwtClaims.claims.registered.iat
           Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
@@ -118,7 +116,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now = getInstantNowSeconds
           val adHocRegisteredClaims =
-            registeredClaims.copy(iat = now.some, exp = now.plusSeconds(5.minutes.toSeconds).some, nbf = now.some)
+            registeredClaims.copy(iat = Some(now), exp = Some(now.plusSeconds(5.minutes.toSeconds)), nbf = Some(now))
           val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
           val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
@@ -128,7 +126,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           Option(decodedJWT.getSubject) shouldBe jwtClaims.claims.registered.sub
           Option(decodedJWT.getAudience)
             .map(_.asScala.toSeq)
-            .sequence
+            .toSeq
             .flatten shouldBe jwtClaims.claims.registered.aud
           Try(decodedJWT.getIssuedAt.toInstant).toOption shouldBe jwtClaims.claims.registered.iat
           Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
@@ -232,7 +230,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
           val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
           val jwt       = jwtIssuer.issueJwt()
 
-          jwt shouldBe JwtIssueError.IllegalArgument("The Algorithm cannot be null.").asLeft
+          jwt.left.value shouldBe JwtIssueError.IllegalArgument("The Algorithm cannot be null.")
       }
     }
   }

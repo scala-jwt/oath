@@ -3,9 +3,10 @@ package io.oath.jwt
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.{JWT, JWTCreator}
-import io.oath.jwt.config.JwtIssuerConfig
-import io.oath.jwt.model._
-import io.oath.jwt.utils._
+import io.oath.config.JwtIssuerConfig
+import io.oath.json.ClaimsEncoder
+import io.oath.model._
+import io.oath.utils._
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}

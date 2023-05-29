@@ -1,8 +1,9 @@
 package io.oath.jwt
 
-import io.oath.jwt.config.JwtManagerConfig
-import io.oath.jwt.syntax._
-import io.oath.jwt.testkit.{AnyWordSpecBase, PropertyBasedTesting}
+import io.oath.JwtManager
+import io.oath.config.JwtManagerConfig
+import io.oath.syntax._
+import io.oath.testkit._
 
 class JwtManagerSpec extends AnyWordSpecBase with PropertyBasedTesting {
 
