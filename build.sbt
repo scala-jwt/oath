@@ -5,7 +5,7 @@ ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
-ThisBuild / tlBaseVersion := "1.0"
+ThisBuild / tlBaseVersion := "1.1"
 ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
@@ -54,8 +54,14 @@ lazy val root = Projects
   .settings(Aliases.all)
   .aggregate(modules *)
 
+lazy val oathMacros = Projects
+  .createModule("oath-macros", "modules/oath-macros")
+  .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
+  .settings(Dependencies.oathMacros)
+
 lazy val oathCore = Projects
   .createModule("oath-core", "modules/oath-core")
+  .dependsOn(oathMacros)
   .settings(Dependencies.oathCore)
 
 lazy val oathCirce = Projects
@@ -69,6 +75,7 @@ lazy val oathJsoniterScala = Projects
   .dependsOn(oathCore % "compile->compile;test->test")
 
 lazy val modules: Seq[ProjectReference] = Seq(
+  oathMacros,
   oathCore,
   oathCirce,
   oathJsoniterScala,

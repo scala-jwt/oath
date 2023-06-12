@@ -12,17 +12,15 @@ final class OathManager[A] private (mapping: Map[A, JManager]) {
 
 object OathManager {
 
-  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathManager[A] =
-    tokenEnumEntry.values
+  def none[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathManager[A] =
+    tokenEnum.tokenValues
       .map(_ -> new JManager(ConfigLoader.noneManager()))
       .toMap
       .pipe(mapping => new OathManager(mapping))
 
-  def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathManager[A] =
-    tokenEnumEntry.mapping.view
-      .mapValues(configLocation => ConfigLoader.loadOrThrowManager(configLocation))
-      .mapValues(config => new JManager(config))
-      .toMap
+  def createOrFail[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathManager[A] =
+    tokenEnum.tokenValues.map { tokenType =>
+      tokenType -> ConfigLoader.loadOrThrowManager(tokenType.configName).pipe(new JManager(_))
+    }.toMap
       .pipe(mapping => new OathManager(mapping))
-
 }

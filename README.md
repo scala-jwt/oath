@@ -55,7 +55,7 @@ Oath is an extension on top of [JWT](./docs/JWT.md). It's suggested to read that
 a basic understanding of JWTs, the internals and the configuration settings available for this library.
 Oath will allow you to create custom tokens from scala ADT `Enum` associated with different properties and hide the
 boilerplate
-in configuration files. Oath depends on [Enumeratum](https://github.com/lloydmeta/enumeratum) in order to collect
+in configuration files. Oath macros are inspired from [Enumeratum](https://github.com/lloydmeta/enumeratum) in order to collect
 the information needed for the custom `Enum`.
 
 ### Oath Overview
@@ -67,20 +67,22 @@ retrieve the
 names for each `Enum` custom value on compile time using macros.
 
 ```scala
-trait TokenEnumEntry extends EnumEntry
+trait OathEnumEntry
+```
 
-trait TokenEnum[A <: TokenEnumEntry] extends Enum[A]
+```scala
+trait OathEnum[A <: OathEnumEntry]
 ```
 
 ### OathToken Example
 
-The `Enum` token names will be converted from `UPPER_CAMEL => LOWER_HYPHEN` which is
+The `Enum` token names will be converted by default from `UPPER_CAMEL => LOWER_HYPHEN` which is
 going to be the name that the library is going to search in your local config file.
 
 ```scala
-sealed trait OathExampleToken extends TokenEnumEntry
+sealed trait OathExampleToken extends OathEnumEntry
 
-object OathExampleToken extends TokenEnum[OathExampleToken] {
+object OathExampleToken extends OathEnum[OathExampleToken] {
   case object AccessToken extends OathExampleToken // name in config access-token
 
   case object RefreshToken extends OathExampleToken // refresh-token
@@ -89,7 +91,7 @@ object OathExampleToken extends TokenEnum[OathExampleToken] {
 
   case object ForgotPasswordToken extends OathExampleToken // forgot-password-token
 
-  override def values: IndexedSeq[OathExampleToken] = findValues
+  override val tokenValues: Set[OathExampleToken] = findTokenEnumMembers
 
   val oathManager: OathManager[OathExampleToken] = OathManager.createOrFail(OathExampleToken)
 
@@ -97,6 +99,30 @@ object OathExampleToken extends TokenEnum[OathExampleToken] {
   val RefreshTokenManager: JwtManager[RefreshToken.type] = oathManager.as(RefreshToken)
   val ActivationEmailTokenManager: JwtManager[ActivationEmailToken.type] = oathManager.as(ActivationEmailToken)
   val ForgotPasswordTokenManager: JwtManager[ForgotPasswordToken.type] = oathManager.as(ForgotPasswordToken)
+}
+```
+
+OR you can override a configName with: 
+```scala
+sealed trait OathExampleToken extends OathEnumEntry
+
+object OathExampleToken extends OathEnum[OathExampleToken] {
+  case object AccessToken extends OathExampleToken {
+    override val configName: String = "access-session-token" // name in config access-session-token
+  }
+
+  ...
+}
+```
+
+OR you can override all configName 
+```scala
+sealed abstract class OathExampleToken(override val configName: String) extends OathEnumEntry
+
+object OathExampleToken extends OathEnum[OathExampleToken] {
+  case object AccessToken extends OathExampleToken("access-session-token") // name in config access-session-token
+
+  ...
 }
 ```
 

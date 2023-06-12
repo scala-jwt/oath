@@ -1,7 +1,7 @@
 package io.oath.utils
 
-import enumeratum.{Enum, EnumEntry}
 import io.oath.testkit.AnyWordSpecBase
+import io.oath.{OathEnum, OathEnumEntry}
 
 class FormatConversionSpec extends AnyWordSpecBase {
 
@@ -18,21 +18,21 @@ class FormatConversionSpec extends AnyWordSpecBase {
     }
 
     "convert scala enum string values to lower hyphen" in {
-      sealed trait SomeEnum extends EnumEntry
+      sealed trait SomeEnum extends OathEnumEntry
 
-      object SomeEnum extends Enum[SomeEnum] {
-        override def values: IndexedSeq[SomeEnum] = findValues
-
+      object SomeEnum extends OathEnum[SomeEnum] {
         case object firstEnum extends SomeEnum
         case object SecondEnum extends SomeEnum
         case object Third extends SomeEnum
         case object ForthEnumValue extends SomeEnum
+
+        override val tokenValues: Set[SomeEnum] = findTokenEnumMembers
       }
 
       val expected = Seq("first-enum", "second-enum", "third", "forth-enum-value")
 
-      SomeEnum.values
-        .map(_.entryName)
+      SomeEnum.tokenValues
+        .map(_.configName)
         .map(FormatConversion.convertUpperCamelToLowerHyphen) should contain theSameElementsAs expected
     }
   }
