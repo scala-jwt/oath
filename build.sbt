@@ -56,6 +56,7 @@ lazy val root = Projects
 
 lazy val oathMacros = Projects
   .createModule("oath-macros", "modules/oath-macros")
+  .enablePlugins(NoPublishPlugin)
   .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
   .settings(Dependencies.oathMacros)
 
