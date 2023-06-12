@@ -12,17 +12,15 @@ final class OathIssuer[A] private (mapping: Map[A, JIssuer]) {
 
 object OathIssuer {
 
-  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathIssuer[A] =
-    tokenEnumEntry.values
+  def none[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathIssuer[A] =
+    tokenEnum.tokenValues
       .map(_ -> new JIssuer(ConfigLoader.noneIssuer()))
       .toMap
       .pipe(mapping => new OathIssuer(mapping))
 
-  def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathIssuer[A] =
-    tokenEnumEntry.mapping.view
-      .mapValues(configLocation => ConfigLoader.loadOrThrowIssuer(configLocation))
-      .mapValues(config => new JIssuer(config))
-      .toMap
+  def createOrFail[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathIssuer[A] =
+    tokenEnum.tokenValues.map { tokenType =>
+      tokenType -> ConfigLoader.loadOrThrowIssuer(tokenType.configName).pipe(new JIssuer(_))
+    }.toMap
       .pipe(mapping => new OathIssuer(mapping))
-
 }

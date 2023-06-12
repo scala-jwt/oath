@@ -12,7 +12,6 @@ object Dependencies {
     val bcprov             = "1.73"
     val circe              = "0.14.5"
     val jsoniterScala      = "2.23.1"
-    val enumeratum         = "1.7.2"
   }
 
   object Testing {
@@ -40,11 +39,10 @@ object Dependencies {
   }
 
   object Utils {
-    val config     = "com.typesafe"     % "config"         % Versions.config
-    val bcprov     = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
-    val enumeratum = "com.beachape"    %% "enumeratum"     % Versions.enumeratum
+    val config = "com.typesafe"     % "config"         % Versions.config
+    val bcprov = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
 
-    val all = Seq(config, bcprov, enumeratum)
+    val all = Seq(config, bcprov)
   }
 
   object Auth0 {
@@ -52,6 +50,9 @@ object Dependencies {
 
     val all = Seq(javaJWT)
   }
+
+  lazy val oathMacros =
+    libraryDependencies ++= Testing.all
 
   lazy val oathCore =
     libraryDependencies ++= Testing.all ++ Auth0.all ++ Utils.all ++ Circe.all.map(_ % Test)

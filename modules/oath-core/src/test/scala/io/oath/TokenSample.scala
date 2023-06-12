@@ -1,11 +1,10 @@
 package io.oath
 
-sealed trait TokenSample extends TokenEnumEntry
+sealed trait TokenSample extends OathEnumEntry
 
-object TokenSample extends TokenEnum[TokenSample] {
-  object AccessToken extends TokenSample
+object TokenSample extends OathEnum[TokenSample] {
+  case object AccessToken extends TokenSample
+  case object refreshToken extends TokenSample
 
-  object refreshToken extends TokenSample
-
-  override def values: IndexedSeq[TokenSample] = findValues
+  override val tokenValues: Set[TokenSample] = findTokenEnumMembers
 }

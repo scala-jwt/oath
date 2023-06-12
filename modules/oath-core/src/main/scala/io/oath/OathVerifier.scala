@@ -12,17 +12,16 @@ final class OathVerifier[A] private (mapping: Map[A, JVerifier]) {
 
 object OathVerifier {
 
-  def none[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathVerifier[A] =
-    tokenEnumEntry.values
+  def none[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathVerifier[A] =
+    tokenEnum.tokenValues
       .map(_ -> new JVerifier(ConfigLoader.noneVerifier()))
       .toMap
       .pipe(mapping => new OathVerifier(mapping))
 
-  def createOrFail[A <: TokenEnumEntry](tokenEnumEntry: TokenEnum[A]): OathVerifier[A] =
-    tokenEnumEntry.mapping.view
-      .mapValues(configLocation => ConfigLoader.loadOrThrowVerifier(configLocation))
-      .mapValues(config => new JVerifier(config))
-      .toMap
+  def createOrFail[A <: OathEnumEntry](tokenEnum: OathEnum[A]): OathVerifier[A] =
+    tokenEnum.tokenValues.map { tokenType =>
+      tokenType -> ConfigLoader.loadOrThrowVerifier(tokenType.configName).pipe(new JVerifier(_))
+    }.toMap
       .pipe(mapping => new OathVerifier(mapping))
 
 }
