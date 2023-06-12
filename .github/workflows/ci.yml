@@ -97,11 +97,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: mkdir -p target modules/oath-core/target modules/oath-circe/target modules/oath-jsoniter-scala/target project/target
+        run: mkdir -p modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target target modules/oath-macros/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: tar cf targets.tar target modules/oath-core/target modules/oath-circe/target modules/oath-jsoniter-scala/target project/target
+        run: tar cf targets.tar modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target target modules/oath-macros/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
