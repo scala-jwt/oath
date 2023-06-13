@@ -90,7 +90,7 @@ final case class RegisteredClaims(
 Claims is more than Registered Claims though. Therefore, if the business requirements requires extra claims to be able
 to authenticate & authorize the clients,
 the library provides an `ADT` to describe each use case and the location for additional claims.
-There is extension methods already created if you `import io.oath.syntax._` then you should be able to convert `Any`
+There is extension methods created for convenience `import io.oath.syntax._` then you should be able to convert `Any`
 to a `JwtClaims`.
 
 ```scala
@@ -140,7 +140,7 @@ Use only for verifying JWT Tokens. For asymmetric algorithms only public-key is 
 see [configuration](#configuration).
 In order for the verifier API to determine the location of the data in the token, the `verifyJwt` function takes
 a `JwtToken`.
-There is extension methods already created if you `import io.oath.syntax._` then you should be able to convert any
+There is extension methods created for convenience `import io.oath.syntax._` then you should be able to convert any
 string to a `JwtToken`.
 
 ```scala
@@ -454,7 +454,7 @@ token {
 }
 ```
 
-### Oath Sample
+#### Oath Sample
 
 ```hocon
 oath {
