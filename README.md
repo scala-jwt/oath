@@ -70,7 +70,7 @@ if you have already used those libraries you would probably find your self famil
 In a microservice architecture you could have more than on service issuing or verifying tokens.
 The library is being design to follow this principle by splitting the requirements to different APIs.
 
-#### JWT Issuer
+#### JwtIssuer Overview
 
 All registered claims documented in [RFC-7519](https://www.rfc-editor.org/rfc/rfc7519.html) are provided with optional
 values, therefore the library doesn't enforce you to use them.
@@ -134,7 +134,7 @@ val maybeJwt: Either[IssueJwtError, Jwt[JwtClaims.ClaimsP[Foo]]] = issuer.issueJ
 // Right(Jwt(ClaimsP(Foo(foo,10),RegisteredClaims(None,None,List(),None,None,None,None)),eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiZm9vIiwiYWdlIjoxMH0.oeU3zySKPA-fowGQkl0WPDwyBhXJUEtobSjGQsDBXcs))
 ```
 
-#### Verifier Overview
+#### JwtVerifier Overview
 
 Use only for verifying JWT Tokens. For asymmetric algorithms only public-key is required,
 see [configuration](#configuration).
@@ -177,7 +177,7 @@ val claims: Either[JwtVerifyError, JwtClaims.ClaimsP[Foo]] = verifier.verifyJwt[
 // Right(ClaimsP(Foo(foo,10),RegisteredClaims(None,None,List(),None,None,None,None)))
 ```
 
-#### Manager Overview
+#### JwtManager Overview
 
 Used for verifying and issuing JWT Tokens, see [configuration](#configuration).
 
@@ -201,7 +201,7 @@ val claims: JwtClaims.ClaimsP[Foo] = manager.verifyJwt[Foo](jwt.token.toTokenP).
 ### Advanced Encryption Standard (AES)
 
 Sensitive data in JWT Tokens might lead to an exposure of unwanted information (User data, Internal technologies, etc.).
-It's recommended to encrypt the data when send over networks to prevent data leaks and been exposed to attacks.
+It's recommended to encrypt the data when is possible on the client side  to prevent data leaks and been exposed to attacks.
 To enable encryption you must provide a `secret` key to the [configuration](#configuration) file.
 
 ```hocon
