@@ -51,9 +51,7 @@ libraryDependencies += "io.github.scala-jwt" %% "oath-jsoniter-scala" % "0.0.0"
 
 ## Introduction
 
-Oath is an extension on top of [JWT](./docs/JWT.md). It's suggested to read that first to gain
-a basic understanding of JWTs, the internals and the configuration settings available for this library.
-Oath will allow you to create custom tokens from scala ADT `Enum` associated with different properties and hide the
+Oath is an extension on top of JWT. Oath will allow you to create custom tokens from scala ADT `Enum` associated with different properties and hide the
 boilerplate
 in configuration files. Oath macros are inspired from [Enumeratum](https://github.com/lloydmeta/enumeratum) in order to collect
 the information needed for the custom `Enum`.
@@ -67,39 +65,46 @@ by [akka-http-session](https://github.com/softwaremill/akka-http-session)
 & [jwt-scala](https://github.com/jwt-scala/jwt-scala)
 if you have already used those libraries you would probably find your self familiar with this API.
 
-### Model overview
+### JWT API Overview
+
+In a microservice architecture you could have more than on service issuing or verifying tokens.
+The library is being design to follow this principle by splitting the requirements to different APIs.
+
+#### JWT Issuer
 
 All registered claims documented in [RFC-7519](https://www.rfc-editor.org/rfc/rfc7519.html) are provided with optional
 values, therefore the library doesn't enforce you to use them.
 
 ```scala
 final case class RegisteredClaims(
-                                   iss: Option[String] = None,
-                                   sub: Option[String] = None,
-                                   aud: Seq[String] = Seq.empty,
-                                   exp: Option[Instant] = None,
-                                   nbf: Option[Instant] = None,
-                                   iat: Option[Instant] = None,
-                                   jti: Option[String] = None
-                                 )
+    iss: Option[String] = None,
+    sub: Option[String] = None,
+    aud: Seq[String] = Seq.empty,
+    exp: Option[Instant] = None,
+    nbf: Option[Instant] = None,
+    iat: Option[Instant] = None,
+    jti: Option[String] = None
+  )
 ```
 
 Claims is more than Registered Claims though. Therefore, if the business requirements requires extra claims to be able
 to authenticate & authorize the clients,
-the library provides an ADT to describe each use case and the location for additional claims.
+the library provides an `ADT` to describe each use case and the location for additional claims.
+There is extension methods already created if you `import io.oath.syntax._` then you should be able to convert `Any`
+to a `JwtClaims`.
 
 ```scala
 sealed trait JwtClaims
 
 object JwtClaims {
 
-  final case class Claims(registered: RegisteredClaims) extends JwtClaims
+  final case class Claims(registered: RegisteredClaims = RegisteredClaims.empty) extends JwtClaims
 
-  final case class ClaimsH[+H](header: H, registered: RegisteredClaims) extends JwtClaims
+  final case class ClaimsH[+H](header: H, registered: RegisteredClaims = RegisteredClaims.empty) extends JwtClaims
 
-  final case class ClaimsP[+P](payload: P, registered: RegisteredClaims) extends JwtClaims
+  final case class ClaimsP[+P](payload: P, registered: RegisteredClaims = RegisteredClaims.empty) extends JwtClaims
 
-  final case class ClaimsHP[+H, +P](header: H, payload: P, registered: RegisteredClaims) extends JwtClaims
+  final case class ClaimsHP[+H, +P](header: H, payload: P, registered: RegisteredClaims = RegisteredClaims.empty) extends JwtClaims
 }
 ```
 
@@ -110,20 +115,13 @@ the below data structure. The `token` is in this form `base64(header).base64(pay
 final case class Jwt[+C <: JwtClaims](claims: C, token: String)
 ```
 
-### JWT API Overview
-
-In a microservice architecture you could have more than on service issuing or verifying tokens.
-The library is being design to follow this principle by splitting the requirements to different APIs.
-
-#### JWT Issuer
-
 Use only for issuing JWT Tokens. For asymmetric algorithms only private-key is required,
 see [configuration](#configuration).
 
 ```scala
 import io.circe.generic.auto._
-import io.oath.jwt.syntax._
-import io.oath.jwt.circe._
+import io.oath.syntax._
+import io.oath.circe._
 
 final case class Foo(name: String, age: Int)
 
@@ -142,7 +140,7 @@ Use only for verifying JWT Tokens. For asymmetric algorithms only public-key is 
 see [configuration](#configuration).
 In order for the verifier API to determine the location of the data in the token, the `verifyJwt` function takes
 a `JwtToken`.
-There is extension methods already created if you `import io.oath.jwt.syntax._` then you should be able to convert any
+There is extension methods already created if you `import io.oath.syntax._` then you should be able to convert any
 string to a `JwtToken`.
 
 ```scala
