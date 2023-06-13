@@ -247,7 +247,12 @@ val maybeJwt: Either[IssueJwtError, Jwt[JwtClaims.ClaimsP[Foo]]] = issuer.issueJ
 // Right(Jwt(ClaimsP(Foo(foo,10),RegisteredClaims(Some(foo),Some(subject),List(),None,None,None,None)),eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiZm9vIiwiaXNzIjoiaXNzdWVyIiwiYWdlIjoxMH0.Dlow6pYmJ-5STSuEzL3WYnjpCrGYMKzadIwlOK_WBBc))
 ```
 
-### OathEnumEntry && OathEnum
+### Oath Example
+
+As described above we have 3 main components `JwtIssuer`, `JwtVerifier` and `JwtManager`.
+The bellow example will demonstrate how to create one of this components for multiple tokens with different configuration using scala `ADT`.
+
+#### OathEnumEntry && OathEnum
 
 Those traits are necessary to retrieve the
 names for each `Enum` custom value on compile time using macros.
@@ -260,10 +265,8 @@ trait OathEnumEntry
 trait OathEnum[A <: OathEnumEntry]
 ```
 
-### OathToken Example
-
 The `Enum` token names will be converted by default from `UPPER_CAMEL => LOWER_HYPHEN` which is
-going to be the name that the library is going to search in your local config file.
+going to be the name that the library is going to search in your local config file. 
 
 ```scala
 sealed trait OathExampleToken extends OathEnumEntry
@@ -279,7 +282,8 @@ object OathExampleToken extends OathEnum[OathExampleToken] {
 
   override val tokenValues: Set[OathExampleToken] = findTokenEnumMembers
 
-  val oathManager: OathManager[OathExampleToken] = OathManager.createOrFail(OathExampleToken)
+  // Use OathIssuer or OathVerifier to construct JwtIssuer's or JwtVerifier's
+  val oathManager: OathManager[OathExampleToken] = OathManager.createOrFail(OathExampleToken) 
 
   val AccessTokenManager: JwtManager[AccessToken.type] = oathManager.as(AccessToken)
   val RefreshTokenManager: JwtManager[RefreshToken.type] = oathManager.as(RefreshToken)
@@ -288,7 +292,8 @@ object OathExampleToken extends OathEnum[OathExampleToken] {
 }
 ```
 
-OR you can override a configName with: 
+OR you can override a configName with:
+
 ```scala
 sealed trait OathExampleToken extends OathEnumEntry
 
@@ -301,7 +306,8 @@ object OathExampleToken extends OathEnum[OathExampleToken] {
 }
 ```
 
-OR you can override all configName 
+OR you can override all configNames with:
+
 ```scala
 sealed abstract class OathExampleToken(override val configName: String) extends OathEnumEntry
 
