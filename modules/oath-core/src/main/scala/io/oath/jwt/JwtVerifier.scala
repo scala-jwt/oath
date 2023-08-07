@@ -8,8 +8,9 @@ import io.oath.json.ClaimsDecoder
 import io.oath.model._
 import io.oath.utils._
 
-import scala.util.chaining.scalaUtilChainingOps
 import scala.util.control.Exception.allCatch
+
+import scala.util.chaining.scalaUtilChainingOps
 
 final class JwtVerifier(config: JwtVerifierConfig) {
 
