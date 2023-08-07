@@ -48,7 +48,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
       jti = decodedJWT.getOptionJwtID,
     )
 
-  private def decryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
+  private def maybeDecryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
     config.encrypt
       .map(encryptionConfig => DecryptionUtils.decryptAES(token, encryptionConfig.secret))
       .getOrElse(Right(token))
@@ -86,7 +86,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   def verifyJwt(jwt: JwtToken.Token): Either[JwtVerifyError, JwtClaims.Claims] =
     for {
       token          <- validateToken(jwt.token)
-      decryptedToken <- decryptJwt(token)
+      decryptedToken <- maybeDecryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       registeredClaims = getRegisteredClaims(decodedJwt)
     } yield JwtClaims.Claims(registeredClaims)
@@ -96,7 +96,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   ): Either[JwtVerifyError, JwtClaims.ClaimsH[H]] =
     for {
       token          <- validateToken(jwt.token)
-      decryptedToken <- decryptJwt(token)
+      decryptedToken <- maybeDecryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       json           <- base64DecodeToken(decodedJwt.getHeader)
       payload        <- safeDecode(claimsDecoder.decode(json))
@@ -108,7 +108,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   ): Either[JwtVerifyError, JwtClaims.ClaimsP[P]] =
     for {
       token          <- validateToken(jwt.token)
-      decryptedToken <- decryptJwt(token)
+      decryptedToken <- maybeDecryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       json           <- base64DecodeToken(decodedJwt.getPayload)
       payload        <- safeDecode(claimsDecoder.decode(json))
@@ -121,7 +121,7 @@ final class JwtVerifier(config: JwtVerifierConfig) {
   ): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     for {
       token          <- validateToken(jwt.token)
-      decryptedToken <- decryptJwt(token)
+      decryptedToken <- maybeDecryptJwt(token)
       decodedJwt     <- verify(decryptedToken)
       jsonHeader     <- base64DecodeToken(decodedJwt.getHeader)
       jsonPayload    <- base64DecodeToken(decodedJwt.getPayload)

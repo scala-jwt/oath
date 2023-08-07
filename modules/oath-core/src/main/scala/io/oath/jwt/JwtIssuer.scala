@@ -50,12 +50,12 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
     )
   }
 
-  private def encryptJwt[T <: JwtClaims](jwt: Jwt[T]): Either[JwtIssueError.EncryptionError, Jwt[T]] =
+  private def maybeEncryptJwt[T <: JwtClaims](jwt: Jwt[T]): Either[JwtIssueError.EncryptionError, Jwt[T]] =
     config.encrypt
       .map(encryptConfig =>
         EncryptionUtils
           .encryptAES(jwt.token, encryptConfig.secret)
-          .map(token => jwt.copy(token = token))
+          .map(encryptedToken => jwt.copy(token = encryptedToken))
       )
       .getOrElse(Right(jwt))
 
@@ -72,7 +72,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
     val jwtBuilder = JWT.create()
     setRegisteredClaims(claims.registered)
       .pipe(registeredClaims => buildJwt(jwtBuilder, registeredClaims) -> registeredClaims)
-      .pipe { case (jwtBuilder, registeredClaims: RegisteredClaims) =>
+      .pipe { case (jwtBuilder, registeredClaims) =>
         safeSign(jwtBuilder, config.algorithm)
           .map(token =>
             Jwt(
@@ -81,7 +81,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
             )
           )
       }
-      .flatMap(encryptJwt)
+      .flatMap(maybeEncryptJwt)
   }
 
   def issueJwt[H](claims: JwtClaims.ClaimsH[H])(implicit
@@ -97,7 +97,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- encryptJwt(jwt)
+      encryptedJwt <- maybeEncryptJwt(jwt)
     } yield encryptedJwt
   }
 
@@ -114,7 +114,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- encryptJwt(jwt)
+      encryptedJwt <- maybeEncryptJwt(jwt)
     } yield encryptedJwt
   }
 
@@ -133,7 +133,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- encryptJwt(jwt)
+      encryptedJwt <- maybeEncryptJwt(jwt)
     } yield encryptedJwt
   }
 }
