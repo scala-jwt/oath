@@ -9,7 +9,7 @@ object Dependencies {
     val scalacheck         = "1.17.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.2"
-    val bcprov             = "1.74"
+    val bcprov             = "1.76"
     val circe              = "0.14.5"
     val jsoniterScala      = "2.23.2"
   }
