@@ -1,3 +1,6 @@
 package io.oath
 
-package object circe extends CirceClaimsDecoderConversion with CirceClaimsEncoderConversion
+package object circe {
+
+  object syntax extends CirceClaimsDecoderConversion with CirceClaimsEncoderConversion
+}

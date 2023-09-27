@@ -10,7 +10,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
   private val AlgorithmConfigLocation = "algorithm"
 
   "AlgorithmLoader" should {
-    "load none encryption algorithm config" in forAll { issuer: String =>
+    "load none encryption algorithm config" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-none").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -24,7 +24,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "load RSXXX encryption algorithm with secret key" in forAll { issuer: String =>
+    "load RSXXX encryption algorithm with secret key" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-rsxxx").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -38,7 +38,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "load HSXXX encryption algorithm with secret key" in forAll { issuer: String =>
+    "load HSXXX encryption algorithm with secret key" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-hsxxx").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -52,7 +52,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "load ES256 encryption algorithm with secret key" in forAll { issuer: String =>
+    "load ES256 encryption algorithm with secret key" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es256").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -66,7 +66,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "load ES384 encryption algorithm with secret key" in forAll { issuer: String =>
+    "load ES384 encryption algorithm with secret key" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es384").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -80,7 +80,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "load ES512 encryption algorithm with secret key" in forAll { issuer: String =>
+    "load ES512 encryption algorithm with secret key" in forAll { (issuer: String) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-es512").getConfig(AlgorithmConfigLocation)
       val issuingAlgorithm      = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = true)
       val verifyingAlgorithm    = AlgorithmLoader.loadOrThrow(algorithmScopedConfig, isIssuer = false)
@@ -94,7 +94,7 @@ class AlgorithmLoaderSpec extends AnyWordSpecBase with PropertyBasedTesting {
       token should not be empty
     }
 
-    "fail to load unsupported algorithm type" in forAll { bool: Boolean =>
+    "fail to load unsupported algorithm type" in forAll { (bool: Boolean) =>
       val algorithmScopedConfig = ConfigFactory.load("algorithm-unsupported").getConfig(AlgorithmConfigLocation)
       the[IllegalArgumentException] thrownBy AlgorithmLoader
         .loadOrThrow(algorithmScopedConfig, bool) should have message "Unsupported signature algorithm: Boom"

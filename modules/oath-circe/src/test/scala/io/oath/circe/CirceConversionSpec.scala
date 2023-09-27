@@ -2,6 +2,7 @@ package io.oath.circe
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import io.oath.circe.syntax._
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
 import io.oath.config.JwtVerifierConfig._
 import io.oath.config.{JwtIssuerConfig, JwtVerifierConfig}

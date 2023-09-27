@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
 import io.oath.config.JwtVerifierConfig._
 import io.oath.config.{JwtIssuerConfig, JwtVerifierConfig}
+import io.oath.jsoniter_scala.syntax._
 import io.oath.jwt.{JwtIssuer, JwtVerifier}
 import io.oath.model.{JwtClaims, JwtVerifyError}
 import io.oath.testkit.AnyWordSpecBase

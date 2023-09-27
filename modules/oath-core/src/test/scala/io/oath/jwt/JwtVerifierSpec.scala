@@ -56,7 +56,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
   }
 
   "JwtVerifier" should {
-    "verify token with prerequisite configurations" in forAll { config: JwtVerifierConfig =>
+    "verify token with prerequisite configurations" in forAll { (config: JwtVerifierConfig) =>
       val jwtVerifier = new JwtVerifier(config.copy(encrypt = None))
 
       val testData = setRegisteredClaims(JWT.create(), config)
@@ -289,20 +289,21 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
       verified.left.value shouldBe JwtVerifyError.VerificationError("The Claim 'iss' is not present in the JWT.")
     }
 
-    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll { config: JwtVerifierConfig =>
-      val jwtVerifier = new JwtVerifier(config.copy(algorithm = null, encrypt = None))
+    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll {
+      (config: JwtVerifierConfig) =>
+        val jwtVerifier = new JwtVerifier(config.copy(algorithm = null, encrypt = None))
 
-      val token = JWT
-        .create()
-        .sign(config.algorithm)
+        val token = JWT
+          .create()
+          .sign(config.algorithm)
 
-      val verified = jwtVerifier.verifyJwt(token.toToken)
+        val verified = jwtVerifier.verifyJwt(token.toToken)
 
-      verified.left.value shouldBe JwtVerifyError.IllegalArgument("The Algorithm cannot be null.")
+        verified.left.value shouldBe JwtVerifyError.IllegalArgument("The Algorithm cannot be null.")
     }
 
     "fail to verify token with AlgorithmMismatch when jwt header algorithm doesn't match with verify" in forAll {
-      config: JwtVerifierConfig =>
+      (config: JwtVerifierConfig) =>
         val jwtVerifier = new JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret"), encrypt = None))
 
         val token = JWT
@@ -317,7 +318,7 @@ class JwtVerifierSpec extends AnyWordSpecBase with PropertyBasedTesting with Clo
     }
 
     "fail to verify token with SignatureVerificationError when secrets provided are wrong" in forAll {
-      config: JwtVerifierConfig =>
+      (config: JwtVerifierConfig) =>
         val jwtVerifier = new JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret2"), encrypt = None))
 
         val token = JWT
