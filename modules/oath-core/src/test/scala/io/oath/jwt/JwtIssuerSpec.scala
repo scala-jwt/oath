@@ -26,7 +26,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
 
   "JwtIssuer" should {
     "issue jwt tokens" when {
-      "issue token with predefine configure claims" in forAll { config: JwtIssuerConfig =>
+      "issue token with predefine configure claims" in forAll { (config: JwtIssuerConfig) =>
         val now       = getInstantNowSeconds
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt().value
@@ -226,7 +226,7 @@ class JwtIssuerSpec extends AnyWordSpecBase with PropertyBasedTesting with Clock
       }
 
       "issue token should fail with IllegalArgument when algorithm is set to null" in forAll {
-        config: JwtIssuerConfig =>
+        (config: JwtIssuerConfig) =>
           val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
           val jwt       = jwtIssuer.issueJwt()
 

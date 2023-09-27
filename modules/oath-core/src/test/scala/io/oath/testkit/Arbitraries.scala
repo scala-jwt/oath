@@ -21,7 +21,7 @@ trait Arbitraries {
   lazy val genPositiveFiniteDuration        = Gen.posNum[Long].map(Duration.fromNanos)
   lazy val genPositiveFiniteDurationSeconds = Gen.posNum[Int].map(x => (x + 1).seconds)
 
-  implicit lazy val genNonEmptyString = Arbitrary(
+  implicit val arbNonEmptyString: Arbitrary[String] = Arbitrary(
     Gen.nonEmptyListOf[Char](Gen.alphaChar).map(_.mkString)
   )
 
@@ -30,14 +30,14 @@ trait Arbitraries {
   )
 
   implicit val arbEncryptConfig: Arbitrary[EncryptConfig] = Arbitrary {
-    genNonEmptyString.arbitrary.map(EncryptConfig)
+    arbNonEmptyString.arbitrary.map(EncryptConfig)
   }
 
   implicit val arbJwtIssuerConfig: Arbitrary[JwtIssuerConfig] = Arbitrary {
     for {
-      issuerClaim         <- Gen.option(genNonEmptyString.arbitrary)
-      subjectClaim        <- Gen.option(genNonEmptyString.arbitrary)
-      audienceClaims      <- Gen.listOf(genNonEmptyString.arbitrary)
+      issuerClaim         <- Gen.option(arbNonEmptyString.arbitrary)
+      subjectClaim        <- Gen.option(arbNonEmptyString.arbitrary)
+      audienceClaims      <- Gen.listOf(arbNonEmptyString.arbitrary)
       includeJwtIdClaim   <- Arbitrary.arbitrary[Boolean]
       includeIssueAtClaim <- Arbitrary.arbitrary[Boolean]
       expiresAtOffset     <- Gen.option(genPositiveFiniteDuration)
@@ -57,10 +57,10 @@ trait Arbitraries {
 
   implicit val arbJwtVerifierConfig: Arbitrary[JwtVerifierConfig] = Arbitrary {
     for {
-      encryptKey     <- Gen.option(genNonEmptyString.arbitrary)
-      issuerClaim    <- Gen.option(genNonEmptyString.arbitrary)
-      subjectClaim   <- Gen.option(genNonEmptyString.arbitrary)
-      audienceClaims <- Gen.listOf(genNonEmptyString.arbitrary)
+      encryptKey     <- Gen.option(arbNonEmptyString.arbitrary)
+      issuerClaim    <- Gen.option(arbNonEmptyString.arbitrary)
+      subjectClaim   <- Gen.option(arbNonEmptyString.arbitrary)
+      audienceClaims <- Gen.listOf(arbNonEmptyString.arbitrary)
       leeway         <- Gen.option(genPositiveFiniteDurationSeconds)
       issuedAt       <- Gen.option(genPositiveFiniteDurationSeconds)
       expiresAt      <- Gen.option(genPositiveFiniteDurationSeconds)
@@ -73,10 +73,10 @@ trait Arbitraries {
 
   implicit val arbJwtManagerConfig: Arbitrary[JwtManagerConfig] = Arbitrary {
     for {
-      encryptKey          <- Gen.option(genNonEmptyString.arbitrary)
-      issuerClaim         <- Gen.option(genNonEmptyString.arbitrary)
-      subjectClaim        <- Gen.option(genNonEmptyString.arbitrary)
-      audienceClaims      <- Gen.listOf(genNonEmptyString.arbitrary)
+      encryptKey          <- Gen.option(arbNonEmptyString.arbitrary)
+      issuerClaim         <- Gen.option(arbNonEmptyString.arbitrary)
+      subjectClaim        <- Gen.option(arbNonEmptyString.arbitrary)
+      audienceClaims      <- Gen.listOf(arbNonEmptyString.arbitrary)
       includeJwtIdClaim   <- Arbitrary.arbitrary[Boolean]
       includeIssueAtClaim <- Arbitrary.arbitrary[Boolean]
       expiresAtOffset     <- Gen.option(genPositiveFiniteDurationSeconds)
@@ -103,13 +103,13 @@ trait Arbitraries {
 
   implicit val arbRegisteredClaims: Arbitrary[RegisteredClaims] = Arbitrary {
     for {
-      iss <- Gen.option(genNonEmptyString.arbitrary)
-      sub <- Gen.option(genNonEmptyString.arbitrary)
-      aud <- Gen.listOf(genNonEmptyString.arbitrary)
+      iss <- Gen.option(arbNonEmptyString.arbitrary)
+      sub <- Gen.option(arbNonEmptyString.arbitrary)
+      aud <- Gen.listOf(arbNonEmptyString.arbitrary)
       exp <- Gen.option(arbInstant.arbitrary)
       nbf <- Gen.option(arbInstant.arbitrary)
       iat <- Gen.option(arbInstant.arbitrary)
-      jti <- Gen.option(genNonEmptyString.arbitrary)
+      jti <- Gen.option(arbNonEmptyString.arbitrary)
     } yield RegisteredClaims(iss, sub, aud, exp, nbf, iat, jti)
   }
 
