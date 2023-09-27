@@ -121,7 +121,7 @@ see [configuration](#configuration).
 ```scala
 import io.circe.generic.auto._
 import io.oath.syntax._
-import io.oath.circe._
+import io.oath.circe.derive._
 
 final case class Foo(name: String, age: Int)
 
@@ -163,8 +163,8 @@ object JwtToken {
 
 ```scala
 import io.circe.generic.auto._
-import io.oath.jwt.syntax._
-import io.oath.jwt.circe._
+import io.oath.syntax._
+import io.oath.circe.derive._
 
 final case class Foo(name: String, age: Int)
 
@@ -184,8 +184,8 @@ Used for verifying and issuing JWT Tokens, see [configuration](#configuration).
 ```scala
 import io.circe.generic.auto._
 import eu.timepit.refined.auto._
-import io.oath.jwt.syntax._
-import io.oath.jwt.circe._
+import io.oath.syntax._
+import io.oath.circe.derive._
 
 final case class Foo(name: String, age: Int)
 
@@ -231,9 +231,9 @@ token {
 
 ```scala
 import io.circe.generic.auto._
-import io.oath.jwt.model._
+import io.oath.model._
 import io.oath.syntax._
-import io.oath.circe._
+import io.oath.circe.derive._
 
 final case class Foo(name: String, age: Int)
 
@@ -544,8 +544,3 @@ oath {
   }
 }
 ```
-
-### Known Issues
-
-* Audience single empty string in the list might lead to unexpected behaviours raised
-  in [java-jwt#662](https://github.com/auth0/java-jwt/issues/662) 
