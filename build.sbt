@@ -1,3 +1,5 @@
+import org.typelevel.sbt.gha.Permissions
+
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalaVersion := "2.13.12"
@@ -13,7 +15,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / tlSonatypeUseLegacyHost := false
 ThisBuild / startYear := Some(2022)
-
+ThisBuild / githubWorkflowPermissions := Some(Permissions.WriteAll)
 ThisBuild / githubWorkflowJavaVersions := Seq("11", "17").map(JavaSpec.temurin)
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
