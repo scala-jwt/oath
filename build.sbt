@@ -1,6 +1,10 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "2.13.12"
+val Scala213V: String = "2.13.12"
+val Scala3V: String = "3.3.1"
+
+ThisBuild / crossScalaVersions := List(Scala3V, Scala213V)
+ThisBuild / scalaVersion := Scala213V
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
