@@ -1,5 +1,4 @@
 package io.oath.json
 
-trait ClaimsEncoder[P] {
+trait ClaimsEncoder[P]:
   def encode(data: P): String
-}

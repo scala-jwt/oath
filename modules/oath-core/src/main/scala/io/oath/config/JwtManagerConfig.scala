@@ -4,9 +4,12 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final case class JwtManagerConfig(issuer: JwtIssuerConfig, verifier: JwtVerifierConfig)
+case class JwtManagerConfig(issuer: JwtIssuerConfig, verifier: JwtVerifierConfig)
 
-object JwtManagerConfig {
+object JwtManagerConfig:
+
+  private[oath] def loadOrThrowOath(location: String): JwtManagerConfig =
+    JwtManagerConfig.loadOrThrow(rootConfig.getConfig(location))
 
   def none() = JwtManagerConfig(JwtIssuerConfig.none(), JwtVerifierConfig.none())
 
@@ -14,4 +17,3 @@ object JwtManagerConfig {
 
   def loadOrThrow(config: Config): JwtManagerConfig =
     JwtManagerConfig(JwtIssuerConfig.loadOrThrow(config), JwtVerifierConfig.loadOrThrow(config))
-}

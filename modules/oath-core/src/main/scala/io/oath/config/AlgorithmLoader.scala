@@ -5,21 +5,18 @@ import com.typesafe.config.Config
 import org.bouncycastle.util.io.pem.PemReader
 
 import java.io.{File, FileReader}
-import java.security.interfaces._
+import java.security.interfaces.*
 import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.security.{KeyFactory, PrivateKey, PublicKey}
 import scala.util.Using
+import scala.util.chaining.*
 
-import scala.util.chaining.scalaUtilChainingOps
-
-object AlgorithmLoader {
-
+object AlgorithmLoader:
   private val SecretKeyConfigValue         = "secret-key"
   private val PrivateKeyPemPathConfigValue = "private-key-pem-path"
   private val PublicKeyPemPathConfigValue  = "public-key-pem-path"
-
-  private val RSAKeyFactoryInstance = "RSA"
-  private val ECKeyFactoryInstance  = "EC"
+  private val RSAKeyFactoryInstance        = "RSA"
+  private val ECKeyFactoryInstance         = "EC"
 
   private val RSAKeyFactory = KeyFactory.getInstance(RSAKeyFactoryInstance)
   private val ECKeyFactory  = KeyFactory.getInstance(ECKeyFactoryInstance)
@@ -31,33 +28,31 @@ object AlgorithmLoader {
       algorithmScoped: Config,
       forIssuing: Boolean,
   ): (Option[RSAPrivateKey], Option[RSAPublicKey]) =
-    if (forIssuing) {
+    if forIssuing then
       val privateKey: RSAPrivateKey = loadPrivateKey(algorithmScoped, RSAKeyFactory)
         .map(_.asInstanceOf[RSAPrivateKey])
         .fold(error => throw new IllegalArgumentException(s"Fail to load RSA Private key pem file: $error"), identity)
       (Some(privateKey), None)
-    } else {
+    else
       val publicKey: RSAPublicKey = loadPublicKey(algorithmScoped, RSAKeyFactory)
         .map(_.asInstanceOf[RSAPublicKey])
         .fold(error => throw new IllegalArgumentException(s"Fail to load RSA Public key pem file: $error"), identity)
       (None, Some(publicKey))
-    }
 
   private def loadECKeyOrThrow(
       algorithmScoped: Config,
       forIssuing: Boolean,
   ): (Option[ECPrivateKey], Option[ECPublicKey]) =
-    if (forIssuing) {
+    if forIssuing then
       val privateKey: ECPrivateKey = loadPrivateKey(algorithmScoped, ECKeyFactory)
         .map(_.asInstanceOf[ECPrivateKey])
         .fold(error => throw new IllegalArgumentException(s"Failed to load EC Private key pem file: $error"), identity)
       (Some(privateKey), None)
-    } else {
+    else
       val publicKey: ECPublicKey = loadPublicKey(algorithmScoped, ECKeyFactory)
         .map(_.asInstanceOf[ECPublicKey])
         .fold(error => throw new IllegalArgumentException(s"Failed to load EC Public key pem file: $error"), identity)
       (None, Some(publicKey))
-    }
 
   private def loadPublicKey(algorithmScoped: Config, keyFactory: KeyFactory): Either[String, PublicKey] =
     algorithmScoped
@@ -85,9 +80,9 @@ object AlgorithmLoader {
           .map(error => s"private key pem file: ${error.getMessage}")
       )
 
-  private[config] def loadOrThrow(algorithmScoped: Config, isIssuer: Boolean): Algorithm = {
+  private[oath] def loadOrThrow(algorithmScoped: Config, isIssuer: Boolean): Algorithm =
     val algorithm = algorithmScoped.getString("name")
-    algorithm.trim.toUpperCase match {
+    algorithm.trim.toUpperCase match
       case "HS256" =>
         loadSecretKeyOrThrow(algorithmScoped).pipe(Algorithm.HMAC256)
       case "HS384" =>
@@ -115,6 +110,3 @@ object AlgorithmLoader {
       case "NONE" => Algorithm.none()
       case _ =>
         throw new IllegalArgumentException(s"Unsupported signature algorithm: $algorithm")
-    }
-  }
-}

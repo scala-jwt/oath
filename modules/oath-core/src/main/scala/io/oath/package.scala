@@ -1,11 +1,14 @@
 package io
+import io.oath.utils.*
 
-import io.oath.jwt.{JwtIssuer => JIssuer, JwtManager => JManager, JwtVerifier => JVerifier}
+// Type aliases with extra information, useful to determine the token type.
+package oath:
+  type JIssuer[_]   = JwtIssuer
+  type JManager[_]  = JwtManager
+  type JVerifier[_] = JwtVerifier
 
-package object oath {
-
-  // Type aliases with extra information, useful to determine the token type.
-  type JwtIssuer[_]   = JIssuer
-  type JwtManager[_]  = JManager
-  type JwtVerifier[_] = JVerifier
-}
+  inline private def getEnumValues[A]: Set[(A, String)] =
+    OathEnumMacro
+      .enumValues[A]
+      .toSet
+      .map(value => value -> convertUpperCamelToLowerHyphen(value.toString))
