@@ -11,7 +11,7 @@ object Dependencies {
     val config             = "1.4.3"
     val bcprov             = "1.77"
     val circe              = "0.14.6"
-    val jsoniterScala      = "2.27.3"
+    val jsoniterScala      = "2.27.5"
   }
 
   object Testing {
