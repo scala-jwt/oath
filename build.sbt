@@ -2,12 +2,12 @@ import org.typelevel.sbt.gha.Permissions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "3.3.1"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
-ThisBuild / tlBaseVersion := "1.1"
+ThisBuild / tlBaseVersion := "2.0"
 ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
@@ -16,7 +16,7 @@ ThisBuild / developers := List(
 ThisBuild / tlSonatypeUseLegacyHost := false
 ThisBuild / startYear := Some(2022)
 ThisBuild / githubWorkflowPermissions := Some(Permissions.WriteAll)
-ThisBuild / githubWorkflowJavaVersions := Seq("11", "17").map(JavaSpec.temurin)
+ThisBuild / githubWorkflowJavaVersions := Seq("11", "17", "21").map(JavaSpec.temurin)
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
     id     = "checklint",
@@ -54,11 +54,10 @@ lazy val root = Projects
   .createModule("oath", ".")
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules *)
+  .aggregate(modules*)
 
 lazy val oathMacros = Projects
   .createModule("oath-macros", "modules/oath-macros")
-  .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
   .settings(Dependencies.oathMacros)
 
 lazy val oathCore = Projects

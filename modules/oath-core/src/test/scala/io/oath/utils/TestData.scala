@@ -1,6 +1,6 @@
 package io.oath.utils
 
 import com.auth0.jwt.JWTCreator
-import io.oath.model.RegisteredClaims
+import io.oath.RegisteredClaims
 
-final case class TestData(registeredClaims: RegisteredClaims, builder: JWTCreator.Builder)
+case class TestData(registeredClaims: RegisteredClaims, builder: JWTCreator.Builder)
