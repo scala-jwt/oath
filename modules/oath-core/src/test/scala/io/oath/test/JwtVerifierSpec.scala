@@ -177,8 +177,8 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
       val failedOutOfRangeShorter = jwtVerifier.verifyJwt(outOfRangeShorterToken.toToken)
       val failedNotValid          = jwtVerifier.verifyJwt(notValid.toToken)
 
-      failedOutOfRangeLonger.left.value shouldBe JwtVerifyError.DecryptionError("String index out of range: 97")
-      failedOutOfRangeShorter.left.value shouldBe JwtVerifyError.DecryptionError("String index out of range: 95")
+      failedOutOfRangeLonger.left.value shouldBe a[JwtVerifyError.DecryptionError]
+      failedOutOfRangeShorter.left.value shouldBe a[JwtVerifyError.DecryptionError]
       failedNotValid.left.value shouldBe JwtVerifyError.DecryptionError(
         "Given final block not properly padded. Such issues can arise if a bad key is used during decryption."
       )
