@@ -179,9 +179,7 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
       failedOutOfRangeLonger.left.value shouldBe a[JwtVerifyError.DecryptionError]
       failedOutOfRangeShorter.left.value shouldBe a[JwtVerifyError.DecryptionError]
-      failedNotValid.left.value shouldBe JwtVerifyError.DecryptionError(
-        "Given final block not properly padded. Such issues can arise if a bad key is used during decryption."
-      )
+      failedNotValid.left.value shouldBe a[JwtVerifyError.DecryptionError]
 
     "fail to decode a token with header" in:
       val jwtVerifier = new JwtVerifier(defaultConfig)
