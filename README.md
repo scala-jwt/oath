@@ -90,7 +90,7 @@ final case class RegisteredClaims(
 Claims is more than Registered Claims though. Therefore, if the business requirements requires extra claims to be able
 to authenticate & authorize the clients,
 the library provides an `ADT` to describe each use case and the location for additional claims.
-There is extension methods created for convenience `import io.oath.syntax._` then you should be able to convert `Any`
+There is extension methods created for convenience `import io.oath.syntax.*` then you should be able to convert `Any`
 to a `JwtClaims`.
 
 ```scala
@@ -119,9 +119,9 @@ Use only for issuing JWT Tokens. For asymmetric algorithms only private-key is r
 see [configuration](#configuration).
 
 ```scala
-import io.circe.generic.auto._
-import io.oath.syntax._
-import io.oath.circe.derive._
+import io.circe.generic.auto.*
+import io.oath.syntax.*
+import io.oath.circe.derive.*
 
 final case class Foo(name: String, age: Int)
 
@@ -140,7 +140,7 @@ Use only for verifying JWT Tokens. For asymmetric algorithms only public-key is 
 see [configuration](#configuration).
 In order for the verifier API to determine the location of the data in the token, the `verifyJwt` function takes
 a `JwtToken`.
-There is extension methods created for convenience `import io.oath.syntax._` then you should be able to convert any
+There is extension methods created for convenience `import io.oath.syntax.*` then you should be able to convert any
 string to a `JwtToken`.
 
 ```scala
@@ -162,9 +162,9 @@ object JwtToken {
 ```
 
 ```scala
-import io.circe.generic.auto._
-import io.oath.syntax._
-import io.oath.circe.derive._
+import io.circe.generic.auto.*
+import io.oath.syntax.*
+import io.oath.circe.derive.*
 
 final case class Foo(name: String, age: Int)
 
@@ -182,10 +182,10 @@ val claims: Either[JwtVerifyError, JwtClaims.ClaimsP[Foo]] = verifier.verifyJwt[
 Used for verifying and issuing JWT Tokens, see [configuration](#configuration).
 
 ```scala
-import io.circe.generic.auto._
-import eu.timepit.refined.auto._
-import io.oath.syntax._
-import io.oath.circe.derive._
+import io.circe.generic.auto.*
+import eu.timepit.refined.auto.*
+import io.oath.syntax.*
+import io.oath.circe.derive.*
 
 final case class Foo(name: String, age: Int)
 
@@ -230,10 +230,10 @@ token {
 ```
 
 ```scala
-import io.circe.generic.auto._
-import io.oath.model._
-import io.oath.syntax._
-import io.oath.circe.derive._
+import io.circe.generic.auto.*
+import io.oath.model.*
+import io.oath.syntax.*
+import io.oath.circe.derive.*
 
 final case class Foo(name: String, age: Int)
 

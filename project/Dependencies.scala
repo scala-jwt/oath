@@ -62,5 +62,4 @@ object Dependencies {
 
   lazy val oathJsoniterScala =
     libraryDependencies ++= JsoniterScala.all
-
 }
