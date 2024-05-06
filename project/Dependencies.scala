@@ -4,7 +4,7 @@ import sbt.Keys.*
 object Dependencies {
 
   object Versions {
-    val scalaTest          = "3.2.17"
+    val scalaTest          = "3.2.18"
     val scalaTestPlusCheck = "3.2.17.0"
     val scalacheck         = "1.17.1"
     val javaJWT            = "4.4.0"
