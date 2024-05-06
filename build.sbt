@@ -2,7 +2,7 @@ import org.typelevel.sbt.gha.Permissions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / scalaVersion := "3.3.3"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
@@ -54,7 +54,7 @@ lazy val root = Projects
   .createModule("oath", ".")
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules*)
+  .aggregate(modules *)
 
 lazy val oathMacros = Projects
   .createModule("oath-macros", "modules/oath-macros")
