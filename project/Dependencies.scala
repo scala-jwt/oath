@@ -6,7 +6,7 @@ object Dependencies {
   object Versions {
     val scalaTest          = "3.2.18"
     val scalaTestPlusCheck = "3.2.17.0"
-    val scalacheck         = "1.17.1"
+    val scalacheck         = "1.18.0"
     val javaJWT            = "4.4.0"
     val config             = "1.4.3"
     val bcprov             = "1.78.1"
