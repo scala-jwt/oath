@@ -21,7 +21,7 @@ final class JwtVerifier(config: JwtVerifierConfig):
       .tap(jwtVerification =>
         if (config.providedWith.audienceClaims.nonEmpty)
           jwtVerification.withAudience(config.providedWith.audienceClaims: _*)
-          ()
+        else ()
       )
       .tap(jwtVerification =>
         config.leewayWindow.leeway.map(duration => jwtVerification.acceptLeeway(duration.toSeconds))
@@ -37,7 +37,7 @@ final class JwtVerifier(config: JwtVerifierConfig):
       )
       .build()
 
-  private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
+  inline private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
     RegisteredClaims(
       iss = decodedJWT.getOptionIssuer,
       sub = decodedJWT.getOptionSubject,
@@ -48,40 +48,41 @@ final class JwtVerifier(config: JwtVerifierConfig):
       jti = decodedJWT.getOptionJwtID,
     )
 
-  private def maybeDecryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
+  inline private def maybeDecryptJwt(token: String): Either[JwtVerifyError.DecryptionError, String] =
     config.encrypt
       .map(encryptionConfig => DecryptionUtils.decryptAES(token, encryptionConfig.secret))
       .getOrElse(Right(token))
 
-  private def validateToken(token: String): Either[JwtVerifyError.VerificationError, String] =
-    Option(token).filter(_.nonEmpty).toRight(JwtVerifyError.VerificationError("JWT Token is empty."))
+  inline private def validateToken(token: String): Either[JwtVerifyError.VerificationError, String] =
+    Option(token)
+      .filter(_.nonEmpty)
+      .toRight(JwtVerifyError.VerificationError("JWTVerifier failed with an empty token."))
 
-  private def safeDecode[T](
+  inline private def safeDecode[T](
       decodedObject: => Either[JwtVerifyError.DecodingError, T]
   ): Either[JwtVerifyError.DecodingError, T] =
     allCatch
       .withTry(decodedObject)
       .fold(error => Left(JwtVerifyError.DecodingError(error.getMessage, error)), identity)
 
-  private def handler(decodedJWT: => DecodedJWT): Either[JwtVerifyError, DecodedJWT] =
+  inline private def verify(token: String): Either[JwtVerifyError, DecodedJWT] =
     allCatch
-      .withTry(decodedJWT)
+      .withTry(jwtVerifier.verify(token))
       .toEither
       .left
       .map {
-        case e: IllegalArgumentException       => JwtVerifyError.IllegalArgument(e.getMessage)
-        case e: AlgorithmMismatchException     => JwtVerifyError.AlgorithmMismatch(e.getMessage)
-        case e: SignatureVerificationException => JwtVerifyError.SignatureVerificationError(e.getMessage)
-        case e: TokenExpiredException          => JwtVerifyError.TokenExpired(e.getMessage)
-        case e: JWTVerificationException       => JwtVerifyError.VerificationError(e.getMessage)
-        case e                                 => JwtVerifyError.UnexpectedError(e.getMessage)
+        case e: IllegalArgumentException =>
+          JwtVerifyError.IllegalArgument("JwtVerifier failed with IllegalArgumentException", e)
+        case e: AlgorithmMismatchException =>
+          JwtVerifyError.AlgorithmMismatch("JwtVerifier failed with AlgorithmMismatchException", e)
+        case e: SignatureVerificationException =>
+          JwtVerifyError.SignatureVerificationError("JwtVerifier failed with SignatureVerificationException", e)
+        case e: TokenExpiredException =>
+          JwtVerifyError.TokenExpired("JwtVerifier failed with TokenExpiredException", Some(e))
+        case e: JWTVerificationException =>
+          JwtVerifyError.VerificationError("JwtVerifier failed with JWTVerificationException", Some(e))
+        case e => JwtVerifyError.UnexpectedError("JwtVerifier failed with unexpected exception", Some(e))
       }
-
-  private def verify(token: String): Either[JwtVerifyError, DecodedJWT] =
-    handler(
-      jwtVerifier
-        .verify(token)
-    )
 
   def verifyJwt(jwt: JwtToken.Token): Either[JwtVerifyError, JwtClaims.Claims] =
     for

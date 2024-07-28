@@ -1,6 +1,6 @@
 package io.oath.circe
 
-import io.circe._
+import io.circe.*
 import io.circe.syntax.EncoderOps
 import io.oath.JwtVerifyError
 import io.oath.json.{ClaimsCodec, ClaimsDecoder, ClaimsEncoder}

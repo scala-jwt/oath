@@ -1,21 +1,10 @@
-import sbt.Keys.*
-import sbt.*
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
+import sbt.*
+import sbt.Keys.*
 import scalafix.sbt.ScalafixPlugin.autoImport.scalafixOnCompile
 
 object Projects {
 
-  def createModule(moduleName: String): Project = createModule(moduleName, moduleName)
 
-  def createModule(moduleName: String, fileName: String): Project =
-    Project(moduleName, base = file(fileName))
-      .settings(
-        Test / fork := true,
-        run / fork := true,
-        Test / parallelExecution := false,
-        scalafmtOnCompile := sys.env.getOrElse("RUN_SCALAFMT_ON_COMPILE", "false").toBoolean,
-        scalafixOnCompile := sys.env.getOrElse("RUN_SCALAFIX_ON_COMPILE", "false").toBoolean,
-        semanticdbEnabled := true,
-        semanticdbVersion := "4.8.15",
-      )
+
 }

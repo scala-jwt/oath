@@ -1,3 +1,3 @@
 package io.oath
 
-case class Jwt[T <: JwtClaims](claims: T, token: String)
+final case class Jwt[T <: JwtClaims](claims: T, token: String)

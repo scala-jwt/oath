@@ -3,7 +3,7 @@ package io.oath
 import io.oath.config.*
 import io.oath.json.{ClaimsDecoder, ClaimsEncoder}
 
-final class JwtManager(config: JwtManagerConfig):
+final class JwtManager(config: JwtManagerConfig) {
 
   private val issuer: JwtIssuer     = new JwtIssuer(config.issuer)
   private val verifier: JwtVerifier = new JwtVerifier(config.verifier)
@@ -38,3 +38,4 @@ final class JwtManager(config: JwtManagerConfig):
       jwt: JwtToken.TokenHP
   )(using ClaimsDecoder[H], ClaimsDecoder[P]): Either[JwtVerifyError, JwtClaims.ClaimsHP[H, P]] =
     verifier.verifyJwt[H, P](jwt)
+}

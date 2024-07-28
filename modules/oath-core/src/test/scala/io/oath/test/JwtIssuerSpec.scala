@@ -22,9 +22,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
     .acceptLeeway(5)
     .build()
 
-  "JwtIssuer" should:
-    "issue jwt tokens" when:
-      "issue token with predefine configure claims" in forAll: (config: JwtIssuerConfig) =>
+  "JwtIssuer" should {
+    "issue jwt tokens" when {
+      "issue token with predefine configure claims" in forAll { (config: JwtIssuerConfig) =>
         val now       = getInstantNowSeconds
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None), getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt().value
@@ -52,8 +52,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
         Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe config.registered.notBeforeOffset.map(offset =>
           now.plusSeconds(offset.toSeconds)
         )
+      }
 
-      "issue token with predefine configure claims and ad-hoc registered claims" in forAll:
+      "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now       = getInstantNowSeconds
           val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
@@ -85,8 +86,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
           else if (config.registered.includeJwtIdClaim)
             jwtClaims.claims.registered.jti should not be empty
           else jwtClaims.claims.registered.jti shouldBe empty
+      }
 
-      "issue token with only registered claims empty strings" in forAll:
+      "issue token with only registered claims empty strings" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now = getInstantNowSeconds
           val adHocRegisteredClaims =
@@ -106,8 +108,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
           Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
           Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe jwtClaims.claims.registered.exp
           Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe jwtClaims.claims.registered.nbf
+      }
 
-      "issue token with only registered claims when decoded should have the same values with the return registered claims" in forAll:
+      "issue token with only registered claims when decoded should have the same values with the return registered claims" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           val now = getInstantNowSeconds
           val adHocRegisteredClaims =
@@ -127,8 +130,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
           Option(decodedJWT.getId) shouldBe jwtClaims.claims.registered.jti
           Try(decodedJWT.getExpiresAt.toInstant).toOption shouldBe jwtClaims.claims.registered.exp
           Try(decodedJWT.getNotBefore.toInstant).toOption shouldBe jwtClaims.claims.registered.nbf
+      }
 
-      "issue token with only registered claims encrypted" in forAll:
+      "issue token with only registered claims encrypted" in forAll {
         (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
           whenever(config.encrypt.nonEmpty):
             val clock     = getFixedClock(getInstantNowSeconds)
@@ -137,8 +141,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
 
             jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
             jwt.token.length % 16 shouldBe 0
+      }
 
-      "issue token with header claims" in forAll: (config: JwtIssuerConfig, header: NestedHeader) =>
+      "issue token with header claims" in forAll { (config: JwtIssuerConfig, header: NestedHeader) =>
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None))
         val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
@@ -151,16 +156,18 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
           .value
 
         result shouldBe header
+      }
 
-      "issue token with header claims encrypted" in forAll: (config: JwtIssuerConfig, header: NestedHeader) =>
+      "issue token with header claims encrypted" in forAll { (config: JwtIssuerConfig, header: NestedHeader) =>
         whenever(config.encrypt.nonEmpty):
           val jwtIssuer = new JwtIssuer(config)
           val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
           jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
           jwt.token.length % 16 shouldBe 0
+      }
 
-      "issue token with payload claims" in forAll: (config: JwtIssuerConfig, payload: NestedPayload) =>
+      "issue token with payload claims" in forAll { (config: JwtIssuerConfig, payload: NestedPayload) =>
         val jwtIssuer = new JwtIssuer(config.copy(encrypt = None))
         val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
@@ -173,16 +180,18 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
           .value
 
         result shouldBe payload
+      }
 
-      "issue token with payload claims encrypted" in forAll: (config: JwtIssuerConfig, payload: NestedPayload) =>
+      "issue token with payload claims encrypted" in forAll { (config: JwtIssuerConfig, payload: NestedPayload) =>
         whenever(config.encrypt.nonEmpty):
           val jwtIssuer = new JwtIssuer(config)
           val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
           jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
           jwt.token.length % 16 shouldBe 0
+      }
 
-      "issue token with header & payload claims" in forAll:
+      "issue token with header & payload claims" in forAll {
         (config: JwtIssuerConfig, header: NestedHeader, payload: NestedPayload) =>
           val jwtIssuer = new JwtIssuer(config.copy(encrypt = None))
           val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
@@ -198,8 +207,9 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
 
           headerResult shouldBe header
           payloadResult shouldBe payload
+      }
 
-      "issue token with header & payload claims encrypted" in forAll:
+      "issue token with header & payload claims encrypted" in forAll {
         (config: JwtIssuerConfig, header: NestedHeader, payload: NestedPayload) =>
           whenever(config.encrypt.nonEmpty):
             val jwtIssuer = new JwtIssuer(config)
@@ -207,10 +217,17 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper:
 
             jwt.token should fullyMatch regex """[0123456789ABCDEF]+"""
             jwt.token.length % 16 shouldBe 0
+      }
 
-      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll:
+      "issue token should fail with IllegalArgument when algorithm is set to null" in forAll {
         (config: JwtIssuerConfig) =>
           val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
           val jwt       = jwtIssuer.issueJwt()
 
-          jwt.left.value shouldBe JwtIssueError.IllegalArgument("The Algorithm cannot be null.")
+          jwt.left.value shouldEqual JwtIssueError.IllegalArgument(
+            "JwtIssuer failed with IllegalArgumentException",
+            new IllegalArgumentException("Algorithm cannot be null"),
+          )
+      }
+    }
+  }

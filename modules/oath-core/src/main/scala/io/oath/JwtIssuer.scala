@@ -26,7 +26,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       .tap(builder => registeredClaims.exp.map(builder.withExpiresAt))
       .tap(builder => registeredClaims.nbf.map(builder.withNotBefore))
 
-  private def setRegisteredClaims(adHocRegisteredClaims: RegisteredClaims): RegisteredClaims =
+  private def setRegisteredClaims(adHocRegisteredClaims: RegisteredClaims): RegisteredClaims = {
     val now = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS)
     RegisteredClaims(
       iss = adHocRegisteredClaims.iss orElse config.registered.issuerClaim,
@@ -47,6 +47,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
             .pipe(prefix => prefix + UUID.randomUUID().toString)
         ),
     )
+  }
 
   private def maybeEncryptJwt[T <: JwtClaims](
       jwt: Jwt[T]
@@ -64,14 +65,17 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       .withTry(builder.sign(algorithm))
       .toEither
       .left
-      .map:
-        case e: IllegalArgumentException => JwtIssueError.IllegalArgument(e.getMessage)
-        case e: JWTCreationException     => JwtIssueError.JwtCreationIssueError(e.getMessage)
-        case e                           => JwtIssueError.UnexpectedIssueError(e.getMessage)
+      .map {
+        case e: IllegalArgumentException =>
+          JwtIssueError.IllegalArgument("JwtIssuer failed with IllegalArgumentException", e)
+        case e: JWTCreationException =>
+          JwtIssueError.JwtCreationIssueError("JwtIssuer failed with JWTCreationException", e)
+        case e => JwtIssueError.UnexpectedIssueError("JwtIssuer failed with unexpected exception", Some(e))
+      }
 
   def issueJwt(
       claims: JwtClaims.Claims = JwtClaims.Claims()
-  ): Either[JwtIssueError, Jwt[JwtClaims.Claims]] =
+  ): Either[JwtIssueError, Jwt[JwtClaims.Claims]] = {
     val jwtBuilder = JWT.create()
     setRegisteredClaims(claims.registered)
       .pipe(registeredClaims => buildJwt(jwtBuilder, registeredClaims) -> registeredClaims)
@@ -85,10 +89,11 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
           )
       }
       .flatMap(jwt => maybeEncryptJwt(jwt))
+  }
 
   def issueJwt[H](claims: JwtClaims.ClaimsH[H])(using
       ClaimsEncoder[H]
-  ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsH[H]]] =
+  ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsH[H]]] = {
     val jwtBuilder = JWT.create()
     for
       headerBuilder <- jwtBuilder.safeEncodeHeader(claims.header)
@@ -101,10 +106,11 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       )
       encryptedJwt <- maybeEncryptJwt(jwt)
     yield encryptedJwt
+  }
 
   def issueJwt[P](claims: JwtClaims.ClaimsP[P])(using
       ClaimsEncoder[P]
-  ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsP[P]]] =
+  ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsP[P]]] = {
     val jwtBuilder = JWT.create()
     for
       payloadBuilder <- jwtBuilder.safeEncodePayload(claims.payload)
@@ -117,10 +123,11 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       )
       encryptedJwt <- maybeEncryptJwt(jwt)
     yield encryptedJwt
+  }
 
   def issueJwt[H, P](
       claims: JwtClaims.ClaimsHP[H, P]
-  )(using ClaimsEncoder[H], ClaimsEncoder[P]): Either[JwtIssueError, Jwt[JwtClaims.ClaimsHP[H, P]]] =
+  )(using ClaimsEncoder[H], ClaimsEncoder[P]): Either[JwtIssueError, Jwt[JwtClaims.ClaimsHP[H, P]]] = {
     val jwtBuilder = JWT.create()
     for
       payloadBuilder          <- jwtBuilder.safeEncodePayload(claims.payload)
@@ -134,3 +141,4 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
       )
       encryptedJwt <- maybeEncryptJwt(jwt)
     yield encryptedJwt
+  }

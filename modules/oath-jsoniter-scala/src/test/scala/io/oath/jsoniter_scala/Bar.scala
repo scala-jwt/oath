@@ -7,7 +7,5 @@ import io.oath.jsoniter_scala.syntax.*
 
 final case class Bar(name: String, age: Int)
 
-object Bar {
-
+object Bar:
   implicit val codecBar: ClaimsCodec[Bar] = JsonCodecMaker.make.convert
-}

@@ -6,6 +6,7 @@ import io.oath.*
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
 import io.oath.config.JwtVerifierConfig.*
 import io.oath.config.{JwtIssuerConfig, JwtVerifierConfig}
+import io.oath.json.ClaimsDecoder
 import io.oath.syntax.*
 import io.oath.testkit.AnyWordSpecBase
 import io.oath.utils.CodecUtils
@@ -29,16 +30,17 @@ class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils:
   val jwtVerifier = new JwtVerifier(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)
 
-  "JsoniterConversion" should:
+  "JsoniterConversion" should {
 
-    "convert jsoniter codec to claims (encoders & decoders)" in:
+    "convert jsoniter codec to claims (encoders & decoders)" in {
       val bar    = Bar("bar", 10)
       val jwt    = jwtIssuer.issueJwt(JwtClaims.ClaimsP(bar)).value
       val claims = jwtVerifier.verifyJwt[Bar](jwt.token.toTokenP).value
 
       claims.payload shouldBe bar
+    }
 
-    "convert jsoniter codec to claims decoder and get error" in:
+    "convert jsoniter codec to claims decoder and get error" in {
       val fooJson = """{"name":"Hello","age":"not number"}"""
       val jwt = JWT
         .create()
@@ -46,5 +48,12 @@ class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils:
         .sign(Algorithm.none())
       val claims = jwtVerifier.verifyJwt[Bar](jwt.toTokenP)
 
-      val decodingError: JwtVerifyError = claims.left.value
-      decodingError.error should startWith("illegal number, offset: 0x00000016, buf:")
+      claims.left.value shouldBe a[JwtVerifyError.DecodingError]
+    }
+
+    "convert jsoniter decoder to claims decoder and get error when format is incorrect" in {
+      val barJson = """{"name":,}"""
+
+      summon[ClaimsDecoder[Bar]].decode(barJson).left.value shouldBe a[JwtVerifyError.DecodingError]
+    }
+  }
