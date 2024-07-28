@@ -1,65 +1,32 @@
 import sbt.*
-import sbt.Keys.*
 
 object Dependencies {
 
-  object Versions {
-    val scalaTest          = "3.2.19"
-    val scalaTestPlusCheck = "3.2.17.0"
-    val scalacheck         = "1.17.1"
-    val javaJWT            = "4.4.0"
-    val config             = "1.4.3"
-    val bcprov             = "1.78.1"
-    val circe              = "0.14.7"
-    val jsoniterScala      = "2.27.3"
-  }
+  val scalaTestV          = "3.2.19"
+  val scalaTestPlusCheckV = "3.2.17.0"
+  val scalacheckV         = "1.17.1"
+  val javaJWTV            = "4.4.0"
+  val configV             = "1.4.3"
+  val bcprovV             = "1.78.1"
+  val circeV              = "0.14.7"
+  val jsoniterScalaV      = "2.27.3"
+  val catsV               = "2.12.0"
 
-  object Testing {
-    val scalaTest          = "org.scalatest"     %% "scalatest"       % Versions.scalaTest          % Test
-    val scalaTestPlusCheck = "org.scalatestplus" %% "scalacheck-1-17" % Versions.scalaTestPlusCheck % Test
-    val scalacheck         = "org.scalacheck"    %% "scalacheck"      % Versions.scalacheck         % Test
+  val scalaTest               = "org.scalatest"     %% "scalatest"       % scalaTestV
+  val scalaTestPlusScalaCheck = "org.scalatestplus" %% "scalacheck-1-17" % scalaTestPlusCheckV
+  val scalacheck              = "org.scalacheck"    %% "scalacheck"      % scalacheckV
 
-    val all = Seq(scalaTest, scalaTestPlusCheck, scalacheck)
-  }
+  val circeCore    = "io.circe" %% "circe-core"    % circeV
+  val circeGeneric = "io.circe" %% "circe-generic" % circeV
+  val circeParser  = "io.circe" %% "circe-parser"  % circeV
 
-  object Circe {
-    val core    = "io.circe" %% "circe-core"    % Versions.circe
-    val generic = "io.circe" %% "circe-generic" % Versions.circe
-    val parser  = "io.circe" %% "circe-parser"  % Versions.circe
+  val jsoniterScalacore = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % jsoniterScalaV
+  val jsoniterScalamacros =
+    "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % jsoniterScalaV % "provided"
 
-    val all = Seq(core, generic, parser)
-  }
+  val cats           = "org.typelevel"   %% "cats-core"      % catsV
+  val typesafeConfig = "com.typesafe"     % "config"         % configV
+  val bcprov         = "org.bouncycastle" % "bcprov-jdk18on" % bcprovV
 
-  object JsoniterScala {
-    val core = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % Versions.jsoniterScala
-    val macros =
-      "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % Versions.jsoniterScala % "provided"
-
-    val all = Seq(core, macros)
-  }
-
-  object Utils {
-    val config = "com.typesafe"     % "config"         % Versions.config
-    val bcprov = "org.bouncycastle" % "bcprov-jdk18on" % Versions.bcprov
-
-    val all = Seq(config, bcprov)
-  }
-
-  object Auth0 {
-    val javaJWT = "com.auth0" % "java-jwt" % Versions.javaJWT
-
-    val all = Seq(javaJWT)
-  }
-
-  lazy val oathMacros =
-    libraryDependencies ++= Testing.all
-
-  lazy val oathCore =
-    libraryDependencies ++= Testing.all ++ Auth0.all ++ Utils.all ++ Circe.all.map(_ % Test)
-
-  lazy val oathCirce =
-    libraryDependencies ++= Circe.all
-
-  lazy val oathJsoniterScala =
-    libraryDependencies ++= JsoniterScala.all
+  val javaJWT = "com.auth0" % "java-jwt" % javaJWTV
 }

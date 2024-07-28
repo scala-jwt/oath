@@ -1,12 +1,14 @@
+import Dependencies.*
 import org.typelevel.sbt.gha.Permissions
+
+import scala.util.chaining.*
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / scalaVersion := "3.4.1"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 ThisBuild / tlBaseVersion := "2.0"
 ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
@@ -50,34 +52,93 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
   ),
 )
 
-lazy val root = Projects
-  .createModule("oath", ".")
+ThisBuild / Test / fork := true
+ThisBuild / run / fork := true
+ThisBuild / Test / parallelExecution := true
+ThisBuild / scalafmtOnCompile := sys.env.getOrElse("RUN_SCALAFMT_ON_COMPILE", "false").toBoolean
+ThisBuild / scalafixOnCompile := sys.env.getOrElse("RUN_SCALAFIX_ON_COMPILE", "false").toBoolean
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := "4.8.15"
+
+lazy val rootModuleName = "root"
+
+def rootModule(rootModule: String)(subModule: String): Project =
+  Project(s"$rootModule-$subModule", file(s"$rootModule${if (subModule == rootModuleName) "" else s"/$subModule"}"))
+    .pipe(project =>
+      if (subModule == rootModuleName) project.enablePlugins(NoPublishPlugin)
+      else project
+    )
+
+lazy val root = Project("oath", file("."))
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules *)
+  .aggregate(allModules *)
 
-lazy val oathMacros = Projects
-  .createModule("oath-macros", "modules/oath-macros")
-  .settings(Dependencies.oathMacros)
+lazy val example = project
+  .in(file("example"))
+  .dependsOn(oathCore, oathCirce, oathJsoniterScala)
 
-lazy val oathCore = Projects
-  .createModule("oath-core", "modules/oath-core")
+val createOathModule = rootModule("oath") _
+
+lazy val oathRoot = createOathModule("root")
+  .aggregate(oathModules *)
+
+lazy val oathMacros = createOathModule("macros")
+  .settings(
+    libraryDependencies ++= Seq(
+      scalaTest               % Test,
+      scalaTestPlusScalaCheck % Test,
+      scalacheck              % Test,
+    )
+  )
+
+lazy val oathCore = createOathModule("core")
   .dependsOn(oathMacros)
-  .settings(Dependencies.oathCore)
+  .settings(
+    libraryDependencies ++= Seq(
+      javaJWT,
+      typesafeConfig,
+      bcprov,
+      cats,
+    )
+  )
 
-lazy val oathCirce = Projects
-  .createModule("oath-circe", "modules/oath-circe")
-  .settings(Dependencies.oathCirce)
-  .dependsOn(oathCore % "compile->compile;test->test")
+lazy val oathCoreTest = createOathModule("core-test")
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(oathCore)
+  .settings(
+    libraryDependencies ++= Seq(
+      scalaTest,
+      scalaTestPlusScalaCheck,
+      scalacheck,
+      circeCore,
+      circeGeneric,
+      circeParser,
+    )
+  )
 
-lazy val oathJsoniterScala = Projects
-  .createModule("oath-jsoniter-scala", "modules/oath-jsoniter-scala")
-  .settings(Dependencies.oathJsoniterScala)
-  .dependsOn(oathCore % "compile->compile;test->test")
+lazy val oathCirce = createOathModule("circe")
+  .dependsOn(
+    oathCore,
+    oathCoreTest % Test,
+  )
+  .settings(libraryDependencies ++= Seq(circeCore, circeGeneric, circeParser))
 
-lazy val modules: Seq[ProjectReference] = Seq(
+lazy val oathJsoniterScala = createOathModule("jsoniter-scala")
+  .dependsOn(
+    oathCore,
+    oathCoreTest % Test,
+  )
+  .settings(libraryDependencies ++= Seq(jsoniterScalacore, jsoniterScalamacros))
+
+lazy val oathModules: Seq[ProjectReference] = Seq(
   oathMacros,
   oathCore,
+  oathCoreTest,
   oathCirce,
   oathJsoniterScala,
 )
+
+lazy val exampleModules: Seq[ProjectReference] = Seq(example)
+
+lazy val allModules: Seq[ProjectReference] = exampleModules ++ oathModules
