@@ -11,7 +11,7 @@ import io.oath.syntax.*
 import io.oath.testkit.AnyWordSpecBase
 import io.oath.utils.CodecUtils
 
-class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils:
+class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils {
 
   val verifierConfig =
     JwtVerifierConfig(
@@ -57,3 +57,4 @@ class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils:
       summon[ClaimsDecoder[Bar]].decode(barJson).left.value shouldBe a[JwtVerifyError.DecodingError]
     }
   }
+}

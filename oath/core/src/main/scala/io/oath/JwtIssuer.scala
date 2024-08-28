@@ -1,12 +1,10 @@
 package io.oath
 
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.{JWT, JWTCreator}
 import io.oath.*
 import io.oath.config.*
 import io.oath.json.ClaimsEncoder
-import io.oath.utils.*
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
@@ -49,29 +47,12 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
     )
   }
 
-  private def maybeEncryptJwt[T <: JwtClaims](
-      jwt: Jwt[T]
-  ): Either[JwtIssueError.EncryptionError, Jwt[T]] =
-    config.encrypt
-      .map(encryptConfig =>
-        EncryptionUtils
-          .encryptAES(jwt.token, encryptConfig.secret)
-          .map(encryptedToken => jwt.copy(token = encryptedToken))
-      )
-      .getOrElse(Right(jwt))
-
   private def safeSign(builder: JWTCreator.Builder, algorithm: Algorithm): Either[JwtIssueError, String] =
     allCatch
       .withTry(builder.sign(algorithm))
       .toEither
       .left
-      .map {
-        case e: IllegalArgumentException =>
-          JwtIssueError.IllegalArgument("JwtIssuer failed with IllegalArgumentException", e)
-        case e: JWTCreationException =>
-          JwtIssueError.JwtCreationIssueError("JwtIssuer failed with JWTCreationException", e)
-        case e => JwtIssueError.UnexpectedIssueError("JwtIssuer failed with unexpected exception", Some(e))
-      }
+      .map(e => JwtIssueError.SignError("Signing token failed", e))
 
   def issueJwt(
       claims: JwtClaims.Claims = JwtClaims.Claims()
@@ -88,7 +69,6 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
             )
           )
       }
-      .flatMap(jwt => maybeEncryptJwt(jwt))
   }
 
   def issueJwt[H](claims: JwtClaims.ClaimsH[H])(using
@@ -104,8 +84,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- maybeEncryptJwt(jwt)
-    yield encryptedJwt
+    yield jwt
   }
 
   def issueJwt[P](claims: JwtClaims.ClaimsP[P])(using
@@ -121,8 +100,7 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- maybeEncryptJwt(jwt)
-    yield encryptedJwt
+    yield jwt
   }
 
   def issueJwt[H, P](
@@ -139,7 +117,6 @@ final class JwtIssuer(config: JwtIssuerConfig, clock: Clock = Clock.systemUTC())
         claims.copy(registered = registeredClaims),
         token,
       )
-      encryptedJwt <- maybeEncryptJwt(jwt)
-    yield encryptedJwt
+    yield jwt
   }
 }

@@ -1,7 +1,6 @@
-package io.oath.utils
+package io.oath
 
-import io.oath.test.*
-import io.oath.utils.*
+import io.oath.testkit.*
 
 class UtilsSpec extends AnyWordSpecBase {
 

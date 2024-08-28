@@ -9,7 +9,6 @@ import io.oath.syntax.all.*
 import io.oath.test.NestedHeader.{SimpleHeader, nestedHeaderEncoder}
 import io.oath.test.NestedPayload.{SimplePayload, nestedPayloadEncoder}
 import io.oath.test.*
-import io.oath.utils.*
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -242,7 +241,7 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
       val verified = jwtVerifier.verifyJwt[SimpleHeader](token.toTokenH)
 
-      verified.left.value shouldEqual JwtVerifyError.UnexpectedError("Boom")
+      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
     }
 
     "fail to decode a token with payload if exception raised in decoder" in {
@@ -254,7 +253,7 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
       val verified = jwtVerifier.verifyJwt[SimplePayload](token.toTokenP)
 
-      verified.left.value shouldEqual JwtVerifyError.UnexpectedError("Boom")
+      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
     }
 
     "fail to decode a token with header & payload if exception raised in decoder" in {
@@ -267,7 +266,7 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
       val verified =
         jwtVerifier.verifyJwt[SimpleHeader, SimplePayload](token.toTokenHP)
 
-      verified.left.value shouldEqual JwtVerifyError.UnexpectedError("Boom")
+      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
     }
 
     "fail to verify token with VerificationError when provided with claims are not meet criteria" in {
@@ -296,9 +295,9 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
         val verified = jwtVerifier.verifyJwt(token.toToken)
 
-        verified.left.value shouldEqual JwtVerifyError.IllegalArgument(
+        verified.left.value shouldEqual JwtVerifyError.VerificationError(
           "JwtVerifier failed with IllegalArgumentException",
-          new IllegalArgumentException("The Algorithm cannot be null."),
+          Some(new IllegalArgumentException("The Algorithm cannot be null.")),
         )
     }
 
@@ -314,9 +313,9 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
         verified.left.value shouldEqual
           JwtVerifyError
-            .AlgorithmMismatch(
-              "JwtVerifier failed with AlgorithmMismatchException",
-              new AlgorithmMismatchException("The Algorithm used to sign the JWT is not the one expected."),
+            .VerificationError(
+              "JwtVerifier failed with verification error",
+              Some(new AlgorithmMismatchException("The Algorithm used to sign the JWT is not the one expected.")),
             )
     }
 
@@ -332,9 +331,9 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
         verified.left.value shouldEqual
           JwtVerifyError
-            .SignatureVerificationError(
+            .VerificationError(
               "JwtVerifier failed with SignatureVerificationException",
-              new SignatureVerificationException(algorithm),
+              null,
             )
     }
 
@@ -349,9 +348,9 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
       val verified = jwtVerifier.verifyJwt(token.toToken)
 
-      verified.left.value shouldBe
+      verified.left.value shouldEqual
         JwtVerifyError
-          .TokenExpired(s"The Token has expired on $expiresAt.")
+          .VerificationError(s"The Token has expired on $expiresAt.", null)
     }
 
     "fail to verify an empty string token" in {

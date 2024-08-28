@@ -1,14 +1,10 @@
 package io.oath
 
-sealed trait JwtToken:
-  def token: String
+sealed abstract class JwtToken(val token: String)
 
 object JwtToken {
-  case class Token(token: String) extends JwtToken
-
-  case class TokenH(token: String) extends JwtToken
-
-  case class TokenP(token: String) extends JwtToken
-
-  case class TokenHP(token: String) extends JwtToken
+  final case class Token(override val token: String) extends JwtToken(token)
+  final case class TokenH(override val token: String) extends JwtToken(token)
+  final case class TokenP(override val token: String) extends JwtToken(token)
+  final case class TokenHP(override val token: String) extends JwtToken(token)
 }

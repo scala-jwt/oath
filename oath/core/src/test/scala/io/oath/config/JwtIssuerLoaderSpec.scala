@@ -1,7 +1,7 @@
 package io.oath.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import io.oath.test.*
+import io.oath.testkit.*
 
 import scala.concurrent.duration.DurationInt
 
@@ -19,7 +19,6 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe empty
       config.registered.issuerClaim shouldBe None
       config.registered.subjectClaim shouldBe None
       config.registered.audienceClaims shouldBe Seq.empty
@@ -34,7 +33,6 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
       val config       = JwtIssuerConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe empty
       config.registered.issuerClaim shouldBe Some("issuer")
       config.registered.subjectClaim shouldBe Some("subject")
       config.registered.audienceClaims shouldBe Seq("aud1", "aud2")
@@ -45,10 +43,9 @@ class JwtIssuerLoaderSpec extends AnyWordSpecBase {
       config.algorithm.getName shouldBe "RS256"
     }
 
-    "load token issuer config values from reference configuration file using location" in {
+    "load token issuer config values from reference.conf file using location" in {
       val config = JwtIssuerConfig.loadOrThrow(TokenConfigLocation)
 
-      config.encrypt shouldBe empty
       config.registered.issuerClaim shouldBe Some("issuer")
       config.registered.subjectClaim shouldBe Some("subject")
       config.registered.audienceClaims shouldBe Seq("aud1", "aud2")

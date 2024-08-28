@@ -12,11 +12,12 @@ inline private[config] val OathLocation = "oath"
 private[config] val rootConfig          = ConfigFactory.load().getConfig(OathLocation)
 
 extension (config: Config) {
-  private def ifMissingDefault[T](default: T): PartialFunction[Throwable, T] = { case _: ConfigException.Missing =>
-    default
+  inline private def ifMissingDefault[T](default: T): PartialFunction[Throwable, T] = {
+    case _: ConfigException.Missing =>
+      default
   }
 
-  private[config] def getMaybeNonEmptyString(path: String): Option[String] =
+  inline private[config] def getMaybeNonEmptyString(path: String): Option[String] =
     allCatch
       .withTry(Some(config.getString(path)))
       .recover(ifMissingDefault(Option.empty))
@@ -24,19 +25,19 @@ extension (config: Config) {
       .flatten
       .tap(value => if (value.exists(_.isEmpty)) throw new IllegalArgumentException(s"$path empty string not allowed."))
 
-  private[config] def getMaybeFiniteDuration(path: String): Option[FiniteDuration] =
+  inline private[config] def getMaybeFiniteDuration(path: String): Option[FiniteDuration] =
     allCatch
       .withTry(Some(config.getDuration(path).toScala))
       .recover(ifMissingDefault(None))
       .get
 
-  private[config] def getBooleanDefaultFalse(path: String): Boolean =
+  inline private[config] def getBooleanDefaultFalse(path: String): Boolean =
     allCatch
       .withTry(config.getBoolean(path))
       .recover(ifMissingDefault(false))
       .get
 
-  private[config] def getSeqNonEmptyString(path: String): Seq[String] =
+  inline private[config] def getSeqNonEmptyString(path: String): Seq[String] =
     allCatch
       .withTry(config.getStringList(path).asScala.toSeq)
       .recover(ifMissingDefault(Seq.empty))
@@ -46,7 +47,7 @@ extension (config: Config) {
           throw new IllegalArgumentException(s"$path empty string in the list not allowed.")
       )
 
-  private[config] def getMaybeConfig(path: String): Option[Config] =
+  inline private[config] def getMaybeConfig(path: String): Option[Config] =
     allCatch
       .withTry(Some(config.getConfig(path)))
       .recover(ifMissingDefault(Option.empty))

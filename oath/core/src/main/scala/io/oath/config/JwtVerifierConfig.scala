@@ -2,14 +2,12 @@ package io.oath.config
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.{Config, ConfigFactory}
-import io.oath.config.EncryptConfig.*
 import io.oath.config.JwtVerifierConfig.*
 
 import scala.concurrent.duration.FiniteDuration
 
 final case class JwtVerifierConfig(
     algorithm: Algorithm,
-    encrypt: Option[EncryptConfig],
     providedWith: ProvidedWithConfig,
     leewayWindow: LeewayWindowConfig,
 )
@@ -17,7 +15,6 @@ final case class JwtVerifierConfig(
 object JwtVerifierConfig {
   inline private val VerifierConfigLocation     = "verifier"
   inline private val AlgorithmConfigLocation    = "algorithm"
-  inline private val EncryptConfigLocation      = "encrypt"
   inline private val ProvidedWithConfigLocation = "provided-with"
   inline private val LeewayWindowConfigLocation = "leeway-window"
 
@@ -50,14 +47,12 @@ object JwtVerifierConfig {
   private[oath] def loadOrThrowOath(location: String): JwtVerifierConfig =
     JwtVerifierConfig.loadOrThrow(rootConfig.getConfig(location))
 
-  def none(): JwtVerifierConfig = JwtVerifierConfig(Algorithm.none(), None, ProvidedWithConfig(), LeewayWindowConfig())
+  def none(): JwtVerifierConfig = JwtVerifierConfig(Algorithm.none(), ProvidedWithConfig(), LeewayWindowConfig())
 
   def loadOrThrow(config: Config): JwtVerifierConfig =
     (for
       algorithmScoped <- config.getMaybeConfig(AlgorithmConfigLocation)
       algorithmConfig         = AlgorithmLoader.loadOrThrow(algorithmScoped, isIssuer = false)
-      maybeEncryptionScoped   = config.getMaybeConfig(EncryptConfigLocation)
-      maybeEncryptConfig      = maybeEncryptionScoped.map(EncryptConfig.loadOrThrow)
       maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
       maybeProvidedWithConfig =
         for
@@ -71,7 +66,6 @@ object JwtVerifierConfig {
         yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
     yield JwtVerifierConfig(
       algorithmConfig,
-      maybeEncryptConfig,
       maybeProvidedWithConfig.getOrElse(ProvidedWithConfig()),
       maybeLeewayWindowConfig.getOrElse(LeewayWindowConfig()),
     )).getOrElse(none())

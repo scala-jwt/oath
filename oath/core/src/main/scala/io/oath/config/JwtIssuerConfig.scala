@@ -6,12 +6,11 @@ import io.oath.config.JwtIssuerConfig.RegisteredConfig
 
 import scala.concurrent.duration.FiniteDuration
 
-final case class JwtIssuerConfig(algorithm: Algorithm, encrypt: Option[EncryptConfig], registered: RegisteredConfig)
+final case class JwtIssuerConfig(algorithm: Algorithm, registered: RegisteredConfig)
 
 object JwtIssuerConfig {
   inline private val IssuerConfigLocation     = "issuer"
   inline private val AlgorithmConfigLocation  = "algorithm"
-  inline private val EncryptConfigLocation    = "encrypt"
   inline private val RegisteredConfigLocation = "registered"
 
   final case class RegisteredConfig(
@@ -43,20 +42,18 @@ object JwtIssuerConfig {
       notBeforeOffset,
     )
 
-  def none(): JwtIssuerConfig = JwtIssuerConfig(Algorithm.none(), None, RegisteredConfig())
+  def none(): JwtIssuerConfig = JwtIssuerConfig(Algorithm.none(), RegisteredConfig())
 
   def loadOrThrow(config: Config): JwtIssuerConfig =
     (for
       algorithmScoped <- config.getMaybeConfig(AlgorithmConfigLocation)
-      algorithmConfig       = AlgorithmLoader.loadOrThrow(algorithmScoped, isIssuer = true)
-      maybeEncryptionScoped = config.getMaybeConfig(EncryptConfigLocation)
-      maybeEncryptConfig    = maybeEncryptionScoped.map(EncryptConfig.loadOrThrow)
+      algorithmConfig = AlgorithmLoader.loadOrThrow(algorithmScoped, isIssuer = true)
       maybeRegisteredConfig =
         for
           issuerScoped     <- config.getMaybeConfig(IssuerConfigLocation)
           registeredScoped <- issuerScoped.getMaybeConfig(RegisteredConfigLocation)
         yield loadOrThrowRegisteredConfig(registeredScoped)
-    yield JwtIssuerConfig(algorithmConfig, maybeEncryptConfig, maybeRegisteredConfig.getOrElse(RegisteredConfig())))
+    yield JwtIssuerConfig(algorithmConfig, maybeRegisteredConfig.getOrElse(RegisteredConfig())))
       .getOrElse(none())
 
   def loadOrThrow(location: String): JwtIssuerConfig =

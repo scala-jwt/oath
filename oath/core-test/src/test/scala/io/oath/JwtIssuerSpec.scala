@@ -7,7 +7,6 @@ import io.oath.syntax.all.*
 import io.oath.test.NestedHeader.nestedHeaderDecoder
 import io.oath.test.NestedPayload.nestedPayloadDecoder
 import io.oath.test.*
-import io.oath.utils.*
 
 import scala.concurrent.duration.DurationInt
 import scala.jdk.CollectionConverters.ListHasAsScala
@@ -223,8 +222,8 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
           val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
           val jwt       = jwtIssuer.issueJwt()
 
-          jwt.left.value shouldEqual JwtIssueError.IllegalArgument(
-            "JwtIssuer failed with IllegalArgumentException",
+          jwt.left.value shouldEqual JwtIssueError.SignError(
+            "Signing token failed",
             new IllegalArgumentException("Algorithm cannot be null"),
           )
       }
