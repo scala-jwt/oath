@@ -26,9 +26,6 @@ trait Arbitraries {
       Gen.chooseNum(Long.MinValue, Long.MaxValue).map(Instant.ofEpochMilli)
     )
 
-  implicit val arbEncryptConfig: Arbitrary[EncryptConfig] =
-    Arbitrary(arbNonEmptyString.arbitrary.map(EncryptConfig.apply))
-
   implicit val arbJwtIssuerConfig: Arbitrary[JwtIssuerConfig] =
     Arbitrary {
       for {
@@ -48,14 +45,12 @@ trait Arbitraries {
           expiresAtOffset,
           notBeforeOffset,
         )
-        encrypt <- Gen.option(arbEncryptConfig.arbitrary)
-      } yield JwtIssuerConfig(Algorithm.none(), encrypt, registered)
+      } yield JwtIssuerConfig(Algorithm.none(), registered)
     }
 
   implicit val arbJwtVerifierConfig: Arbitrary[JwtVerifierConfig] =
     Arbitrary {
       for {
-        encryptKey     <- Gen.option(arbNonEmptyString.arbitrary)
         issuerClaim    <- Gen.option(arbNonEmptyString.arbitrary)
         subjectClaim   <- Gen.option(arbNonEmptyString.arbitrary)
         audienceClaims <- Gen.listOf(arbNonEmptyString.arbitrary)
@@ -63,16 +58,14 @@ trait Arbitraries {
         issuedAt       <- Gen.option(genPositiveFiniteDurationSeconds)
         expiresAt      <- Gen.option(genPositiveFiniteDurationSeconds)
         notBefore      <- Gen.option(genPositiveFiniteDurationSeconds)
-        encrypt      = encryptKey.map(EncryptConfig.apply)
         leewayWindow = LeewayWindowConfig(leeway, issuedAt, expiresAt, notBefore)
         providedWith = ProvidedWithConfig(issuerClaim, subjectClaim, audienceClaims)
-      } yield JwtVerifierConfig(Algorithm.none(), encrypt, providedWith, leewayWindow)
+      } yield JwtVerifierConfig(Algorithm.none(), providedWith, leewayWindow)
     }
 
   implicit val arbJwtManagerConfig: Arbitrary[JwtManagerConfig] =
     Arbitrary {
       for {
-        encryptKey          <- Gen.option(arbNonEmptyString.arbitrary)
         issuerClaim         <- Gen.option(arbNonEmptyString.arbitrary)
         subjectClaim        <- Gen.option(arbNonEmptyString.arbitrary)
         audienceClaims      <- Gen.listOf(arbNonEmptyString.arbitrary)
@@ -85,7 +78,6 @@ trait Arbitraries {
         expiresAt           <- Gen.option(genPositiveFiniteDurationSeconds)
         leewayWindow = LeewayWindowConfig(leeway, issuedAt, expiresAt, notBeforeOffset.map(_.plus(1.second)))
         providedWith = ProvidedWithConfig(issuerClaim, subjectClaim, audienceClaims)
-        encrypt      = encryptKey.map(EncryptConfig.apply)
         registered = RegisteredConfig(
           issuerClaim,
           subjectClaim,
@@ -95,8 +87,8 @@ trait Arbitraries {
           expiresAtOffset,
           notBeforeOffset,
         )
-        verifier = JwtVerifierConfig(Algorithm.none(), encrypt, providedWith, leewayWindow)
-        issuer   = JwtIssuerConfig(Algorithm.none(), encrypt, registered)
+        verifier = JwtVerifierConfig(Algorithm.none(), providedWith, leewayWindow)
+        issuer   = JwtIssuerConfig(Algorithm.none(), registered)
       } yield JwtManagerConfig(issuer, verifier)
     }
 

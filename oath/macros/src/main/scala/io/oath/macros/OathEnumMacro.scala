@@ -1,4 +1,4 @@
-package io.oath
+package io.oath.macros
 
 import scala.quoted.*
 

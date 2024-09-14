@@ -1,8 +1,7 @@
 package io.oath.test
 
-import cats.syntax.all.*
 import com.auth0.jwt.{JWT, JWTCreator}
-import io.oath.config.{EncryptConfig, JwtVerifierConfig}
+import io.oath.config.JwtVerifierConfig
 import io.oath.syntax.all.*
 import io.oath.{JwtVerifier, RegisteredClaims}
 
@@ -44,7 +43,7 @@ object Main extends App, Arbitraries {
 
   val defaultConfig = arbJwtVerifierConfig.arbitrary.sample.get
 
-  val jwtVerifier = new JwtVerifier(defaultConfig.copy(encrypt = EncryptConfig("secret").some))
+  val jwtVerifier = new JwtVerifier(defaultConfig)
 
   val (_, builder) = setRegisteredClaims(JWT.create(), defaultConfig)
 

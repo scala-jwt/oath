@@ -12,21 +12,21 @@ final case class NestedHeader(name: String, mapping: Map[String, SimpleHeader])
 object NestedHeader {
   final case class SimpleHeader(name: String, data: List[String])
 
-  given simpleHeaderCirceEncoder: Encoder[SimpleHeader] = deriveEncoder[SimpleHeader]
+  given Encoder[SimpleHeader] = deriveEncoder[SimpleHeader]
 
-  given simpleHeaderCirceDecoder: Decoder[SimpleHeader] = deriveDecoder[SimpleHeader]
+  given Decoder[SimpleHeader] = deriveDecoder[SimpleHeader]
 
-  given nestedHeaderCirceEncoder: Encoder[NestedHeader] = deriveEncoder[NestedHeader]
+  given circeEncoder: Encoder[NestedHeader] = deriveEncoder[NestedHeader]
 
-  given nestedHeaderCirceDecoder: Decoder[NestedHeader] = deriveDecoder[NestedHeader]
+  given circeDecoder: Decoder[NestedHeader] = deriveDecoder[NestedHeader]
 
-  given simpleHeaderEncoder: ClaimsEncoder[SimpleHeader] = simpleHeader => simpleHeader.asJson.noSpaces
+  given ClaimsEncoder[SimpleHeader] = simpleHeader => simpleHeader.asJson.noSpaces
 
-  given simpleHeaderDecoder: ClaimsDecoder[SimpleHeader] = _ => throw new RuntimeException("Boom")
+  given ClaimsDecoder[SimpleHeader] = _ => throw new RuntimeException("Boom")
 
-  given nestedHeaderEncoder: ClaimsEncoder[NestedHeader] = nestedHeader => nestedHeader.asJson.noSpaces
+  given claimsEncoder: ClaimsEncoder[NestedHeader] = nestedHeader => nestedHeader.asJson.noSpaces
 
-  given nestedHeaderDecoder: ClaimsDecoder[NestedHeader] = nestedHeaderJson =>
+  given claimsDecoder: ClaimsDecoder[NestedHeader] = nestedHeaderJson =>
     parse(nestedHeaderJson).left
       .map(parsingFailure => JwtVerifyError.DecodingError(parsingFailure.message, parsingFailure.underlying))
       .flatMap(

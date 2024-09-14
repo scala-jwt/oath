@@ -1,13 +1,13 @@
-package io.oath
+package io.oath.utils
 
 import io.oath.testkit.*
 
-class UtilsSpec extends AnyWordSpecBase {
+class FormatterSpec extends AnyWordSpecBase {
 
-  "FormatConversion" should {
+  "Formatter" should {
     "convert upper camel case to lower hyphen" in {
-      val res1 = convertUpperCamelToLowerHyphen("HelloWorld")
-      val res2 = convertUpperCamelToLowerHyphen(" Hello World ")
+      val res1 = Formatter.convertUpperCamelToLowerHyphen("HelloWorld")
+      val res2 = Formatter.convertUpperCamelToLowerHyphen(" Hello World ")
 
       val expected = "hello-world"
 
@@ -23,7 +23,7 @@ class UtilsSpec extends AnyWordSpecBase {
 
       SomeEnum.values.toSeq
         .map(_.toString)
-        .map(convertUpperCamelToLowerHyphen) should contain theSameElementsAs expected
+        .map(Formatter.convertUpperCamelToLowerHyphen) should contain theSameElementsAs expected
     }
   }
 }

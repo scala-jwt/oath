@@ -19,7 +19,6 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(DefaultTokenConfigLocation)
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe empty
       config.providedWith.issuerClaim shouldBe None
       config.providedWith.subjectClaim shouldBe None
       config.providedWith.audienceClaims shouldBe Seq.empty
@@ -35,7 +34,6 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(TokenConfigLocation)
       val config       = JwtVerifierConfig.loadOrThrow(configLoader)
 
-      config.encrypt shouldBe empty
       config.providedWith.issuerClaim shouldBe Some("issuer")
       config.providedWith.subjectClaim shouldBe Some("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")
@@ -49,7 +47,6 @@ class JwtVerifierLoaderSpec extends AnyWordSpecBase {
     "load token verifier config values from reference configuration file using location" in {
       val config = JwtVerifierConfig.loadOrThrow(TokenConfigLocation)
 
-      config.encrypt shouldBe empty
       config.providedWith.issuerClaim shouldBe Some("issuer")
       config.providedWith.subjectClaim shouldBe Some("subject")
       config.providedWith.audienceClaims shouldBe Seq("aud1", "aud2")

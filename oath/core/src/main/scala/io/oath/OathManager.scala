@@ -1,23 +1,31 @@
 package io.oath
 
+import io.oath.OathManager.JManager
 import io.oath.config.*
 
 import scala.util.chaining.scalaUtilChainingOps
 
-final class OathManager[A](mapping: Map[A, JwtManager]) {
-  def as[S <: A](tokenType: S): JManager[S] = mapping(tokenType)
+trait OathManager[A] {
+  def as[S <: A](tokenType: S): JManager[S]
 }
 
 object OathManager {
+  // Type aliases with extra information, useful to determine the token type.
+  type JManager[_] = JwtManager
+
+  private final class JavaJwtOathManager[A](mapping: Map[A, JwtManager]) extends OathManager[A] {
+    def as[S <: A](tokenType: S): JManager[S] = mapping(tokenType)
+  }
+
   inline def none[A]: OathManager[A] =
     getEnumValues[A].map { case (tokenType, _) =>
       tokenType -> JwtManager(JwtManagerConfig.none())
     }.toMap
-      .pipe(mapping => OathManager(mapping))
+      .pipe(mapping => new JavaJwtOathManager(mapping))
 
   inline def createOrFail[A]: OathManager[A] =
     getEnumValues[A].map { case (tokenType, tokenConfig) =>
       tokenType -> JwtManagerConfig.loadOrThrowOath(tokenConfig).pipe(JwtManager(_))
     }.toMap
-      .pipe(mapping => OathManager(mapping))
+      .pipe(mapping => new JavaJwtOathManager(mapping))
 }

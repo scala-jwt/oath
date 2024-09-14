@@ -1,4 +1,5 @@
-package io.oath
+package io.oath.macros
 
-object OathEnum:
+object OathEnum {
   inline def apply[A]: Set[A] = OathEnumMacro.enumValues[A].toSet
+}

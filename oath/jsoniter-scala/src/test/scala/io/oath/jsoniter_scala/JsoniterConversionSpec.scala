@@ -27,7 +27,7 @@ class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils {
       RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None),
     )
 
-  val jwtVerifier = new JwtVerifier(verifierConfig)
+  val jwtVerifier = new JwtVerifierSpec(verifierConfig)
   val jwtIssuer   = new JwtIssuer(issuerConfig)
 
   "JsoniterConversion" should {

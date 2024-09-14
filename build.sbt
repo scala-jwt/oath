@@ -51,7 +51,7 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
 
 ThisBuild / Test / fork := true
 ThisBuild / run / fork := true
-ThisBuild / Test / parallelExecution := true
+ThisBuild / Test / parallelExecution := false
 ThisBuild / Test / testForkedParallel := true
 ThisBuild / scalafmtOnCompile := sys.env.getOrElse("RUN_SCALAFMT_ON_COMPILE", "false").toBoolean
 ThisBuild / scalafixOnCompile := sys.env.getOrElse("RUN_SCALAFIX_ON_COMPILE", "false").toBoolean

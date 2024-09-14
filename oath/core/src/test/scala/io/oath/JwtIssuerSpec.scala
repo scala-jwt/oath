@@ -2,11 +2,10 @@ package io.oath
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.NestedHeader.nestedHeaderDecoder
-import io.oath.NestedPayload.nestedPayloadDecoder
 import io.oath.config.*
 import io.oath.syntax.all.*
 import io.oath.testkit.*
+import io.oath.utils.*
 
 import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.ListHasAsScala
@@ -23,7 +22,7 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
   "JwtIssuer" should {
     "issue token with predefine configure claims" in forAll { (config: JwtIssuerConfig) =>
       val now       = getInstantNowSeconds
-      val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
+      val jwtIssuer = JwtIssuer(config, getFixedClock(now))
       val jwtClaims = jwtIssuer.issueJwt().value
 
       val decodedJWT = jwtVerifier.verify(jwtClaims.token)
@@ -54,7 +53,7 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
     "issue token with predefine configure claims and ad-hoc registered claims" in forAll {
       (registeredClaims: RegisteredClaims, config: JwtIssuerConfig) =>
         val now       = getInstantNowSeconds
-        val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
+        val jwtIssuer = JwtIssuer(config, getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt(registeredClaims.toClaims).value
 
         val expectedIssuer  = registeredClaims.iss orElse config.registered.issuerClaim
@@ -86,7 +85,7 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
         val now = getInstantNowSeconds
         val adHocRegisteredClaims =
           registeredClaims.copy(iat = Some(now), exp = Some(now.plusSeconds(5.minutes.toSeconds)), nbf = Some(now))
-        val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
+        val jwtIssuer = JwtIssuer(config, getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
         val decodedJWT = jwtVerifier.verify(jwtClaims.token)
@@ -108,7 +107,7 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
         val now = getInstantNowSeconds
         val adHocRegisteredClaims =
           registeredClaims.copy(iat = Some(now), exp = Some(now.plusSeconds(5.minutes.toSeconds)), nbf = Some(now))
-        val jwtIssuer = new JwtIssuer(config, getFixedClock(now))
+        val jwtIssuer = JwtIssuer(config, getFixedClock(now))
         val jwtClaims = jwtIssuer.issueJwt(adHocRegisteredClaims.toClaims).value
 
         val decodedJWT = jwtVerifier.verify(jwtClaims.token)
@@ -126,30 +125,30 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
     }
 
     "issue token with header claims" in forAll { (config: JwtIssuerConfig, header: NestedHeader) =>
-      val jwtIssuer = new JwtIssuer(config)
+      val jwtIssuer = JwtIssuer(config)
       val jwt       = jwtIssuer.issueJwt(header.toClaimsH).value
 
       val result = jwtVerifier
         .verify(jwt.token)
         .pipe(_.getHeader)
-        .pipe(base64DecodeToken)
+        .pipe(Base64.decodeToken)
         .pipe(_.value)
-        .pipe(nestedHeaderDecoder.decode)
+        .pipe(NestedHeader.claimsDecoder.decode)
         .value
 
       result shouldBe header
     }
 
     "issue token with payload claims" in forAll { (config: JwtIssuerConfig, payload: NestedPayload) =>
-      val jwtIssuer = new JwtIssuer(config)
+      val jwtIssuer = JwtIssuer(config)
       val jwt       = jwtIssuer.issueJwt(payload.toClaimsP).value
 
       val result = jwtVerifier
         .verify(jwt.token)
         .pipe(_.getPayload)
-        .pipe(base64DecodeToken)
+        .pipe(Base64.decodeToken)
         .pipe(_.value)
-        .pipe(nestedPayloadDecoder.decode)
+        .pipe(NestedPayload.claimsDecoder.decode)
         .value
 
       result shouldBe payload
@@ -157,16 +156,16 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
 
     "issue token with header & payload claims" in forAll {
       (config: JwtIssuerConfig, header: NestedHeader, payload: NestedPayload) =>
-        val jwtIssuer = new JwtIssuer(config)
+        val jwtIssuer = JwtIssuer(config)
         val jwt       = jwtIssuer.issueJwt((header, payload).toClaimsHP).value
 
         val (headerResult, payloadResult) = jwtVerifier
           .verify(jwt.token)
           .pipe(decodedJwt =>
-            base64DecodeToken(decodedJwt.getHeader).value -> base64DecodeToken(decodedJwt.getPayload).value
+            Base64.decodeToken(decodedJwt.getHeader).value -> Base64.decodeToken(decodedJwt.getPayload).value
           )
           .pipe { case (headerJson, payloadJson) =>
-            (nestedHeaderDecoder.decode(headerJson).value, nestedPayloadDecoder.decode(payloadJson).value)
+            (NestedHeader.claimsDecoder.decode(headerJson).value, NestedPayload.claimsDecoder.decode(payloadJson).value)
           }
 
         headerResult shouldBe header
@@ -175,7 +174,7 @@ class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
 
     "issue token should fail with IllegalArgument when algorithm is set to null" in forAll {
       (config: JwtIssuerConfig) =>
-        val jwtIssuer = new JwtIssuer(config.copy(algorithm = null))
+        val jwtIssuer = JwtIssuer(config.copy(algorithm = null))
         val jwt       = jwtIssuer.issueJwt()
 
         val signError = jwt.left.value

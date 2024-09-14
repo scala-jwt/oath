@@ -1,11 +1,11 @@
 package io.oath.testkit
 
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.NestedHeader.SimpleHeader
-import io.oath.NestedPayload.SimplePayload
+import io.oath.NestedHeader.*
+import io.oath.NestedPayload.*
 import io.oath.*
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
-import io.oath.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
+import io.oath.config.JwtVerifierConfig.*
 import io.oath.config.*
 import org.scalacheck.*
 
