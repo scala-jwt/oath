@@ -139,143 +139,181 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
       verified shouldBe Left(JwtVerifyError.DecodingError("DecodingFailure at .mapping: Missing required field", null))
     }
 
-//    "fail to decode a token with header if exception raised in decoder" in {
-//      val jwtVerifier = JwtVerifier(defaultConfig)
-//      val token = JWT
-//        .create()
-//        .sign(defaultConfig.algorithm)
-//
-//      val verified = jwtVerifier.verifyJwt[SimpleHeader](token.toTokenH)
-//
-//      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
-//    }
-//
-//    "fail to decode a token with payload if exception raised in decoder" in {
-//      val jwtVerifier = JwtVerifier(defaultConfig)
-//      val token = JWT
-//        .create()
-//        .sign(defaultConfig.algorithm)
-//
-//      val verified = jwtVerifier.verifyJwt[SimplePayload](token.toTokenP)
-//
-//      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
-//    }
-//
-//    "fail to decode a token with header & payload if exception raised in decoder" in {
-//      val jwtVerifier = JwtVerifier(defaultConfig)
-//      val token = JWT
-//        .create()
-//        .sign(defaultConfig.algorithm)
-//
-//      val verified =
-//        jwtVerifier.verifyJwt[SimpleHeader, SimplePayload](token.toTokenHP)
-//
-//      verified.left.value shouldEqual JwtVerifyError.DecodingError("Boom", null)
-//    }
-//
-//    "fail to verify token with VerificationError when provided with claims are not meet criteria" in {
-//      val config      = defaultConfig.copy(providedWith = defaultConfig.providedWith.copy(issuerClaim = Some("issuer")))
-//      val jwtVerifier = JwtVerifier(config)
-//      val token = JWT
-//        .create()
-//        .sign(config.algorithm)
-//
-//      val verified = jwtVerifier.verifyJwt(token.toToken)
-//
-//      verified.left.value shouldEqual JwtVerifyError.VerificationError(
-//        "JwtVerifier failed with JWTVerificationException",
-//        Some(new JWTVerificationException("The Claim 'iss' is not present in the JWT.")),
-//      )
-//    }
-//
-//    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll {
-//      (config: JwtVerifierConfig) =>
-//        val jwtVerifier = JwtVerifier(config.copy(algorithm = null))
-//        val token = JWT
-//          .create()
-//          .sign(config.algorithm)
-//
-//        val verified = jwtVerifier.verifyJwt(token.toToken)
-//
-//        verified.left.value shouldBe JwtVerifyError.VerificationError(
-//          "JwtVerifier failed with IllegalArgumentException",
-//          Some(new IllegalArgumentException("The Algorithm cannot be null.")),
-//        )
-//    }
-//
-//    "fail to verify token with AlgorithmMismatch when jwt header algorithm doesn't match with verify" in forAll {
-//      (config: JwtVerifierConfig) =>
-//        val jwtVerifier = JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret")))
-//        val token = JWT
-//          .create()
-//          .sign(config.algorithm)
-//
-//        val verified = jwtVerifier.verifyJwt(token.toToken)
-//
-//        verified.left.value shouldEqual
-//          JwtVerifyError
-//            .VerificationError(
-//              "JwtVerifier failed with verification error",
-//              Some(new AlgorithmMismatchException("The Algorithm used to sign the JWT is not the one expected.")),
-//            )
-//    }
-//
-//    "fail to verify token with SignatureVerificationError when secrets provided are wrong" in forAll {
-//      (config: JwtVerifierConfig) =>
-//        val jwtVerifier = JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret2")))
-//        val algorithm   = Algorithm.HMAC256("secret1")
-//        val token = JWT
-//          .create()
-//          .sign(algorithm)
-//
-//        val verified = jwtVerifier.verifyJwt(token.toToken)
-//
-//        verified.left.value shouldEqual
-//          JwtVerifyError
-//            .VerificationError(
-//              "JwtVerifier failed with SignatureVerificationException",
-//              null,
-//            )
-//    }
-//
-//    "fail to verify token with TokenExpired when JWT expires" in {
-//      val jwtVerifier = JwtVerifier(defaultConfig)
-//      val expiresAt   = getInstantNowSeconds.minusSeconds(1)
-//      val token = JWT
-//        .create()
-//        .withExpiresAt(expiresAt)
-//        .sign(defaultConfig.algorithm)
-//
-//      val verified = jwtVerifier.verifyJwt(token.toToken)
-//
-//      verified.left.value shouldEqual
-//        JwtVerifyError
-//          .VerificationError(s"The Token has expired on $expiresAt.", null)
-//    }
-//
-//    "fail to verify an empty string token" in {
-//      val jwtVerifier = JwtVerifier(defaultConfig)
-//      val token       = ""
-//      val verified    = jwtVerifier.verifyJwt(token.toToken)
-//      val verifiedH   = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
-//      val verifiedP   = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
-//      val verifiedHP  = jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
-//
-//      verified.left.value shouldBe
-//        JwtVerifyError
-//          .VerificationError("JWT Token is empty.")
-//
-//      verifiedH.left.value shouldBe
-//        JwtVerifyError
-//          .VerificationError("JWT Token is empty.")
-//
-//      verifiedP.left.value shouldBe
-//        JwtVerifyError
-//          .VerificationError("JWT Token is empty.")
-//
-//      verifiedHP.left.value shouldBe
-//        JwtVerifyError
-//          .VerificationError("JWT Token is empty.")
-//    }
+    "fail to decode a token with header if exception raised in decoder" in {
+      val jwtVerifier = JwtVerifier(defaultConfig)
+      val token = JWT
+        .create()
+        .sign(defaultConfig.algorithm)
+
+      val decodingError = jwtVerifier
+        .verifyJwt[SimpleHeader](token.toTokenH)
+        .left
+        .value
+        .asInstanceOf[JwtVerifyError.DecodingError]
+
+      decodingError.message shouldBe "Boom"
+      decodingError.underlying shouldBe a[RuntimeException]
+      decodingError.underlying.getMessage shouldBe "Boom"
+    }
+
+    "fail to decode a token with payload if exception raised in decoder" in {
+      val jwtVerifier = JwtVerifier(defaultConfig)
+      val token = JWT
+        .create()
+        .sign(defaultConfig.algorithm)
+
+      val decodingError = jwtVerifier
+        .verifyJwt[SimplePayload](token.toTokenP)
+        .left
+        .value
+        .asInstanceOf[JwtVerifyError.DecodingError]
+
+      decodingError.message shouldBe "Boom"
+      decodingError.underlying shouldBe a[RuntimeException]
+      decodingError.underlying.getMessage shouldBe "Boom"
+    }
+
+    "fail to decode a token with header & payload if exception raised in decoder" in {
+      val jwtVerifier = JwtVerifier(defaultConfig)
+      val token = JWT
+        .create()
+        .sign(defaultConfig.algorithm)
+
+      val decodingError =
+        jwtVerifier
+          .verifyJwt[SimpleHeader, SimplePayload](token.toTokenHP)
+          .left
+          .value
+          .asInstanceOf[JwtVerifyError.DecodingError]
+
+      decodingError.message shouldBe "Boom"
+      decodingError.underlying shouldBe a[RuntimeException]
+      decodingError.underlying.getMessage shouldBe "Boom"
+    }
+
+    "fail to verify token with VerificationError when provided with claims are not meet criteria" in {
+      val config      = defaultConfig.copy(providedWith = defaultConfig.providedWith.copy(issuerClaim = Some("issuer")))
+      val jwtVerifier = JwtVerifier(config)
+      val token = JWT
+        .create()
+        .sign(config.algorithm)
+
+      val verificationError = jwtVerifier
+        .verifyJwt(token.toToken)
+        .left
+        .value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationError.message shouldBe "JwtVerifier failed with verification error"
+      verificationError.underlying.value shouldBe a[JWTVerificationException]
+      verificationError.underlying.value.getMessage shouldBe "The Claim 'iss' is not present in the JWT."
+    }
+
+    "fail to verify token with IllegalArgument when null algorithm is provided" in forAll {
+      (config: JwtVerifierConfig) =>
+        val jwtVerifier = JwtVerifier(config.copy(algorithm = null))
+        val token = JWT
+          .create()
+          .sign(config.algorithm)
+
+        val verificationError = jwtVerifier
+          .verifyJwt(token.toToken)
+          .left
+          .value
+          .asInstanceOf[JwtVerifyError.VerificationError]
+
+        verificationError.message shouldBe "JwtVerifier failed with verification error"
+        verificationError.underlying.value shouldBe a[IllegalArgumentException]
+        verificationError.underlying.value.getMessage shouldBe "The Algorithm cannot be null."
+    }
+
+    "fail to verify token with AlgorithmMismatch when jwt header algorithm doesn't match with verify" in forAll {
+      (config: JwtVerifierConfig) =>
+        val jwtVerifier = JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret")))
+        val token = JWT
+          .create()
+          .sign(config.algorithm)
+
+        val verificationError = jwtVerifier
+          .verifyJwt(token.toToken)
+          .left
+          .value
+          .asInstanceOf[JwtVerifyError.VerificationError]
+
+        verificationError.message shouldBe "JwtVerifier failed with verification error"
+        verificationError.underlying.value shouldBe a[AlgorithmMismatchException]
+        verificationError.underlying.value.getMessage shouldBe "The provided Algorithm doesn't match the one defined in the JWT's Header."
+    }
+
+    "fail to verify token with SignatureVerificationError when secrets provided are wrong" in forAll {
+      (config: JwtVerifierConfig) =>
+        val jwtVerifier = JwtVerifier(config.copy(algorithm = Algorithm.HMAC256("secret2")))
+        val algorithm   = Algorithm.HMAC256("secret1")
+        val token = JWT
+          .create()
+          .sign(algorithm)
+
+        val verificationError = jwtVerifier
+          .verifyJwt(token.toToken)
+          .left
+          .value
+          .asInstanceOf[JwtVerifyError.VerificationError]
+
+        verificationError.message shouldBe "JwtVerifier failed with verification error"
+        verificationError.underlying.value shouldBe a[SignatureVerificationException]
+        verificationError.underlying.value.getMessage shouldBe "The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA256"
+    }
+
+    "fail to verify token with TokenExpired when JWT expires" in {
+      val jwtVerifier = JwtVerifier(defaultConfig)
+      val expiresAt   = getInstantNowSeconds.minusSeconds(1)
+      val token = JWT
+        .create()
+        .withExpiresAt(expiresAt)
+        .sign(defaultConfig.algorithm)
+
+      val verificationError = jwtVerifier
+        .verifyJwt(token.toToken)
+        .left
+        .value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationError.message shouldBe "JwtVerifier failed with verification error"
+      verificationError.underlying.value shouldBe a[TokenExpiredException]
+      verificationError.underlying.value.getMessage shouldBe s"The Token has expired on $expiresAt."
+    }
+
+    "fail to verify an empty string token" in {
+      val jwtVerifier = JwtVerifier(defaultConfig)
+      val token       = ""
+      val verified    = jwtVerifier.verifyJwt(token.toToken)
+      val verifiedH   = jwtVerifier.verifyJwt[NestedHeader](token.toTokenH)
+      val verifiedP   = jwtVerifier.verifyJwt[NestedPayload](token.toTokenP)
+      val verifiedHP  = jwtVerifier.verifyJwt[NestedHeader, NestedPayload](token.toTokenHP)
+
+      val verificationError = verified.left.value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationError.message shouldBe "JWTVerifier failed with an empty token."
+      verificationError.underlying shouldBe empty
+
+      val verificationErrorH = verifiedH.left.value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationErrorH.message shouldBe "JWTVerifier failed with an empty token."
+      verificationErrorH.underlying shouldBe empty
+
+      val verificationErrorP = verifiedP.left.value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationErrorP.message shouldBe "JWTVerifier failed with an empty token."
+      verificationErrorP.underlying shouldBe empty
+
+      val verificationErrorHP = verifiedHP.left.value
+        .asInstanceOf[JwtVerifyError.VerificationError]
+
+      verificationErrorHP.message shouldBe "JWTVerifier failed with an empty token."
+      verificationErrorHP.underlying shouldBe empty
+    }
   }
 }

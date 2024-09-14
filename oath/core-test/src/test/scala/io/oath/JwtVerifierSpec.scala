@@ -281,19 +281,19 @@ class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper
 
       verified.left.value shouldBe
         JwtVerifyError
-          .VerificationError("JWT Token is empty.")
+          .VerificationError("JWTVerifier failed with an empty token.")
 
       verifiedH.left.value shouldBe
         JwtVerifyError
-          .VerificationError("JWT Token is empty.")
+          .VerificationError("JWTVerifier failed with an empty token.")
 
       verifiedP.left.value shouldBe
         JwtVerifyError
-          .VerificationError("JWT Token is empty.")
+          .VerificationError("JWTVerifier failed with an empty token.")
 
       verifiedHP.left.value shouldBe
         JwtVerifyError
-          .VerificationError("JWT Token is empty.")
+          .VerificationError("JWTVerifier failed with an empty token.")
     }
   }
 }

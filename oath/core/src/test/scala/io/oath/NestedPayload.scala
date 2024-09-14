@@ -22,7 +22,7 @@ object NestedPayload {
 
   given ClaimsEncoder[SimplePayload] = simplePayload => simplePayload.asJson.noSpaces
 
-  given ClaimsDecoder[SimplePayload] = _ => throw new RuntimeException("Boom")
+  given failWithBoomDecoder: ClaimsDecoder[SimplePayload] = _ => throw new RuntimeException("Boom")
 
   given claimsEncoder: ClaimsEncoder[NestedPayload] = nestedPayload => nestedPayload.asJson.noSpaces
 

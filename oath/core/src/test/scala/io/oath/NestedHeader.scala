@@ -22,7 +22,7 @@ object NestedHeader {
 
   given ClaimsEncoder[SimpleHeader] = simpleHeader => simpleHeader.asJson.noSpaces
 
-  given ClaimsDecoder[SimpleHeader] = _ => throw new RuntimeException("Boom")
+  given failWithBoomDecoder: ClaimsDecoder[SimpleHeader] = _ => throw new RuntimeException("Boom")
 
   given claimsEncoder: ClaimsEncoder[NestedHeader] = nestedHeader => nestedHeader.asJson.noSpaces
 
