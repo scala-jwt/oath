@@ -17,13 +17,17 @@ object OathManager {
     def as[S <: A](tokenType: S): JManager[S] = mapping(tokenType)
   }
 
-  inline def none[A]: OathManager[A] =
+  def none[A](using
+      m: scala.deriving.Mirror.SumOf[A]
+  ): OathManager[A] =
     getEnumValues[A].map { case (tokenType, _) =>
       tokenType -> JwtManager(JwtManagerConfig.none())
     }.toMap
       .pipe(mapping => new JavaJwtOathManager(mapping))
 
-  inline def createOrFail[A]: OathManager[A] =
+  def createOrFail[A](using
+      m: scala.deriving.Mirror.SumOf[A]
+  ): OathManager[A] =
     getEnumValues[A].map { case (tokenType, tokenConfig) =>
       tokenType -> JwtManagerConfig.loadOrThrowOath(tokenConfig).pipe(JwtManager(_))
     }.toMap

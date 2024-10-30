@@ -45,7 +45,7 @@ object JwtVerifier {
         )
         .build()
 
-    inline private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
+    private def getRegisteredClaims(decodedJWT: DecodedJWT): RegisteredClaims =
       RegisteredClaims(
         iss = decodedJWT.getOptionIssuer,
         sub = decodedJWT.getOptionSubject,
@@ -56,19 +56,19 @@ object JwtVerifier {
         jti = decodedJWT.getOptionJwtID,
       )
 
-    inline private def validateToken(token: String): Either[JwtVerifyError.VerificationError, String] =
+    private def validateToken(token: String): Either[JwtVerifyError.VerificationError, String] =
       Option(token)
         .filter(_.nonEmpty)
         .toRight(JwtVerifyError.VerificationError("JWTVerifier failed with an empty token."))
 
-    inline private def safeDecode[T](
+    private def safeDecode[T](
         decodedObject: => Either[JwtVerifyError.DecodingError, T]
     ): Either[JwtVerifyError.DecodingError, T] =
       allCatch
         .withTry(decodedObject)
         .fold(error => Left(JwtVerifyError.DecodingError(error.getMessage, error)), identity)
 
-    inline private def verify(token: String): Either[JwtVerifyError, DecodedJWT] =
+    private def verify(token: String): Either[JwtVerifyError, DecodedJWT] =
       allCatch
         .withTry(jwtVerifier.verify(token))
         .toEither

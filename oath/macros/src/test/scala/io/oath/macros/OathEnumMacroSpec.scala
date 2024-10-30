@@ -11,7 +11,7 @@ class OathEnumMacroSpec extends AnyWordSpec with should.Matchers {
 
   "OathEnumMacros" should {
     "discover all children directories (enum values) in a Sum type" in {
-      val fooChildren = OathEnum[Foo]
+      val fooChildren = OathEnumMacro.enumValues[Foo]
       fooChildren should contain theSameElementsAs Set(Foo.Foo1, Foo.Foo2, Foo.Foo3, Foo.Foo4)
     }
   }

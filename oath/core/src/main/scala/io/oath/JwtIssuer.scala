@@ -4,6 +4,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.{JWT, JWTCreator}
 import io.oath.config.*
 import io.oath.json.ClaimsEncoder
+import io.oath.syntax.internal.*
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}

@@ -13,10 +13,10 @@ final case class JwtVerifierConfig(
 )
 
 object JwtVerifierConfig {
-  inline private val VerifierConfigLocation     = "verifier"
-  inline private val AlgorithmConfigLocation    = "algorithm"
-  inline private val ProvidedWithConfigLocation = "provided-with"
-  inline private val LeewayWindowConfigLocation = "leeway-window"
+  private val VerifierConfigLocation     = "verifier"
+  private val AlgorithmConfigLocation    = "algorithm"
+  private val ProvidedWithConfigLocation = "provided-with"
+  private val LeewayWindowConfigLocation = "leeway-window"
 
   final case class ProvidedWithConfig(
       issuerClaim: Option[String]  = None,

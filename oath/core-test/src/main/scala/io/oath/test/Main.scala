@@ -43,7 +43,7 @@ object Main extends App, Arbitraries {
 
   val defaultConfig = arbJwtVerifierConfig.arbitrary.sample.get
 
-  val jwtVerifier = new JwtVerifier(defaultConfig)
+  val jwtVerifier = JwtVerifier(defaultConfig)
 
   val (_, builder) = setRegisteredClaims(JWT.create(), defaultConfig)
 

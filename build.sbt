@@ -2,7 +2,7 @@ import org.typelevel.sbt.gha.Permissions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "3.4.2"
+ThisBuild / scalaVersion := "3.3.4"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))

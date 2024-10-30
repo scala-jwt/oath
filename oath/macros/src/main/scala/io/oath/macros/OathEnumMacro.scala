@@ -1,11 +1,17 @@
 package io.oath.macros
 
-import scala.quoted.*
+object OathEnumMacro {
 
-object OathEnumMacro:
-  inline def enumValues[E]: Array[E] = ${ enumValuesImpl[E] }
+  inline def enumValues[T](using
+      m: scala.deriving.Mirror.SumOf[T]
+  ): Set[T] =
+    allInstances[m.MirroredElemTypes, m.MirroredType].toSet
 
-  def enumValuesImpl[E: Type](using Quotes): Expr[Array[E]] =
-    import quotes.reflect.*
-    val companion = Ref(TypeTree.of[E].symbol.companionModule)
-    Select.unique(companion, "values").asExprOf[Array[E]]
+  inline def allInstances[ET <: Tuple, T]: List[T] =
+    import scala.compiletime.*
+
+    inline erasedValue[ET] match
+      case _: EmptyTuple => Nil
+      case _: (t *: ts) =>
+        summonInline[ValueOf[t]].value.asInstanceOf[T] :: allInstances[ts, T]
+}

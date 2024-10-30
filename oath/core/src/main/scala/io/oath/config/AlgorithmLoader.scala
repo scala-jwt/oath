@@ -12,11 +12,11 @@ import scala.util.Using
 import scala.util.chaining.*
 
 object AlgorithmLoader {
-  inline private val SecretKeyConfigValue         = "secret-key"
-  inline private val PrivateKeyPemPathConfigValue = "private-key-pem-path"
-  inline private val PublicKeyPemPathConfigValue  = "public-key-pem-path"
-  inline private val RSAKeyFactoryInstance        = "RSA"
-  inline private val ECKeyFactoryInstance         = "EC"
+  private val SecretKeyConfigValue         = "secret-key"
+  private val PrivateKeyPemPathConfigValue = "private-key-pem-path"
+  private val PublicKeyPemPathConfigValue  = "public-key-pem-path"
+  private val RSAKeyFactoryInstance        = "RSA"
+  private val ECKeyFactoryInstance         = "EC"
 
   private val RSAKeyFactory = KeyFactory.getInstance(RSAKeyFactoryInstance)
   private val ECKeyFactory  = KeyFactory.getInstance(ECKeyFactoryInstance)

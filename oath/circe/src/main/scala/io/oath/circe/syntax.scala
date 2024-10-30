@@ -6,10 +6,10 @@ import io.oath.JwtVerifyError
 import io.oath.json.{ClaimsCodec, ClaimsDecoder, ClaimsEncoder}
 
 object syntax {
-  extension [P](encoder: Encoder[P]) inline def convert: ClaimsEncoder[P] = data => data.asJson(encoder).noSpaces
+  extension [P](encoder: Encoder[P]) def convert: ClaimsEncoder[P] = data => data.asJson(encoder).noSpaces
 
   extension [P](decoder: Decoder[P])
-    inline def convert: ClaimsDecoder[P] =
+    def convert: ClaimsDecoder[P] =
       json =>
         parser
           .parse(json)
@@ -22,10 +22,11 @@ object syntax {
           )
 
   extension [P](codec: Codec[P])
-    inline def convertCodec: ClaimsCodec[P] = new ClaimsCodec[P]:
+    def convertCodec: ClaimsCodec[P] = new ClaimsCodec[P] {
       override def decode(token: String): Either[JwtVerifyError.DecodingError, P] =
         codec.asInstanceOf[Decoder[P]].convert.decode(token)
 
       override def encode(data: P): String =
         codec.asInstanceOf[Encoder[P]].convert.encode(data)
+    }
 }

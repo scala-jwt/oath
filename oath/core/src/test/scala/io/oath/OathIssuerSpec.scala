@@ -1,12 +1,13 @@
 package io.oath
 
-import io.oath.test.*
+import io.oath.OathIssuer.JIssuer
+import io.oath.testkit.AnyWordSpecBase
 
 class OathIssuerSpec extends AnyWordSpecBase {
 
   "OathIssuer" should {
     "create jwt token issuers" in {
-      def oathIssuer = OathIssuer.createOrFail[OathToken]
+      val oathIssuer = OathIssuer.createOrFail[OathToken]
 
       val accessTokenIssuer: JIssuer[OathToken.AccessToken.type]   = oathIssuer.as(OathToken.AccessToken)
       val refreshTokenIssuer: JIssuer[OathToken.RefreshToken.type] = oathIssuer.as(OathToken.RefreshToken)

@@ -9,9 +9,9 @@ import scala.concurrent.duration.FiniteDuration
 final case class JwtIssuerConfig(algorithm: Algorithm, registered: RegisteredConfig)
 
 object JwtIssuerConfig {
-  inline private val IssuerConfigLocation     = "issuer"
-  inline private val AlgorithmConfigLocation  = "algorithm"
-  inline private val RegisteredConfigLocation = "registered"
+  private val IssuerConfigLocation     = "issuer"
+  private val AlgorithmConfigLocation  = "algorithm"
+  private val RegisteredConfigLocation = "registered"
 
   final case class RegisteredConfig(
       issuerClaim: Option[String]             = None,

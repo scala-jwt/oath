@@ -7,12 +7,12 @@ import scala.concurrent.duration.DurationInt
 
 class JwtIssuerLoaderSpec extends AnyWordSpecBase {
 
-  inline val configFile                            = "issuer"
-  inline val DefaultTokenConfigLocation            = "default-token"
-  inline val TokenConfigLocation                   = "token"
-  inline val WithoutPrivateKeyTokenConfigLocation  = "without-private-key-token"
-  inline val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
-  inline val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
+  val configFile                            = "issuer"
+  val DefaultTokenConfigLocation            = "default-token"
+  val TokenConfigLocation                   = "token"
+  val WithoutPrivateKeyTokenConfigLocation  = "without-private-key-token"
+  val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
+  val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
 
   "IssuerLoader" should {
     "load default-token issuer config values from configuration file" in {

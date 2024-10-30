@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import io.oath.testkit.*
 
 class AlgorithmLoaderSpec extends AnyWordSpecBase, PropertyBasedTesting {
-  inline val AlgorithmConfigLocation = "algorithm"
+  val AlgorithmConfigLocation = "algorithm"
 
   "AlgorithmLoader" should {
     "load none encryption algorithm config" in forAll { (issuer: String) =>

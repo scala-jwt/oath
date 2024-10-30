@@ -18,13 +18,17 @@ object OathVerifier {
     def as[S <: A](tokenType: S): JVerifier[S] = mapping(tokenType)
   }
 
-  inline def none[A]: OathVerifier[A] =
+  def none[A](using
+      m: scala.deriving.Mirror.SumOf[A]
+  ): OathVerifier[A] =
     getEnumValues[A].map { case (tokenType, _) =>
       tokenType -> JwtVerifier(JwtVerifierConfig.none())
     }.toMap
       .pipe(mapping => new JavaJwtOathVerifier(mapping))
 
-  inline def createOrFail[A]: OathVerifier[A] =
+  def createOrFail[A](using
+      m: scala.deriving.Mirror.SumOf[A]
+  ): OathVerifier[A] =
     getEnumValues[A].map { case (tokenType, tokenConfig) =>
       tokenType -> JwtVerifierConfig.loadOrThrowOath(tokenConfig).pipe(JwtVerifier(_))
     }.toMap
