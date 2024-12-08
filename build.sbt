@@ -2,11 +2,10 @@ import org.typelevel.sbt.gha.Permissions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "3.3.3"
+ThisBuild / scalaVersion := "3.3.4"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
 ThisBuild / tlBaseVersion := "2.0"
 ThisBuild / tlMimaPreviousVersions := Set.empty
 ThisBuild / licenses := Seq(License.Apache2)
@@ -50,34 +49,96 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
   ),
 )
 
-lazy val root = Projects
-  .createModule("oath", ".")
+ThisBuild / Test / fork := true
+ThisBuild / run / fork := true
+ThisBuild / Test / parallelExecution := false
+ThisBuild / Test / testForkedParallel := true
+ThisBuild / scalafmtOnCompile := sys.env.getOrElse("RUN_SCALAFMT_ON_COMPILE", "false").toBoolean
+ThisBuild / scalafixOnCompile := sys.env.getOrElse("RUN_SCALAFIX_ON_COMPILE", "false").toBoolean
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := "4.8.15"
+
+def rootModule(rootModule: String)(subModule: Option[String]): Project =
+  Project(
+    s"$rootModule${subModule.map("-" + _).getOrElse("")}",
+    file(s"$rootModule${subModule.map("/" + _).getOrElse("")}"),
+  )
+
+lazy val root = Project("oath-root", file("."))
   .enablePlugins(NoPublishPlugin)
   .settings(Aliases.all)
-  .aggregate(modules *)
+  .aggregate(allModules *)
 
-lazy val oathMacros = Projects
-  .createModule("oath-macros", "modules/oath-macros")
-  .settings(Dependencies.oathMacros)
+lazy val example = project
+  .in(file("example"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(oathCore, oathCirce, oathJsoniterScala)
 
-lazy val oathCore = Projects
-  .createModule("oath-core", "modules/oath-core")
+lazy val createOathModule = rootModule("oath") _
+
+lazy val oathRoot = createOathModule(None)
+  .enablePlugins(NoPublishPlugin)
+  .aggregate(oathModules *)
+
+lazy val oathMacros = createOathModule(Some("macros"))
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.scalaTest               % Test,
+      Dependencies.scalaTestPlusScalaCheck % Test,
+      Dependencies.scalacheck              % Test,
+    )
+  )
+
+lazy val oathCore = createOathModule(Some("core"))
   .dependsOn(oathMacros)
-  .settings(Dependencies.oathCore)
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.javaJWT,
+      Dependencies.typesafeConfig,
+      Dependencies.bcprov,
+      Dependencies.cats,
+      Dependencies.tink,
+      Dependencies.scalaTest               % Test,
+      Dependencies.scalaTestPlusScalaCheck % Test,
+      Dependencies.scalacheck              % Test,
+      Dependencies.circeCore               % Test,
+      Dependencies.circeGeneric            % Test,
+      Dependencies.circeParser             % Test,
+    )
+  )
 
-lazy val oathCirce = Projects
-  .createModule("oath-circe", "modules/oath-circe")
-  .settings(Dependencies.oathCirce)
-  .dependsOn(oathCore % "compile->compile;test->test")
+lazy val oathCirce = createOathModule(Some("circe"))
+  .dependsOn(
+    oathCore,
+    oathCore % "test->test",
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.circeCore,
+      Dependencies.circeGeneric,
+      Dependencies.circeParser,
+    )
+  )
 
-lazy val oathJsoniterScala = Projects
-  .createModule("oath-jsoniter-scala", "modules/oath-jsoniter-scala")
-  .settings(Dependencies.oathJsoniterScala)
-  .dependsOn(oathCore % "compile->compile;test->test")
+lazy val oathJsoniterScala = createOathModule(Some("jsoniter-scala"))
+  .dependsOn(
+    oathCore,
+    oathCore % "test->test",
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      Dependencies.jsoniterScalacore,
+      Dependencies.jsoniterScalamacros,
+    )
+  )
 
-lazy val modules: Seq[ProjectReference] = Seq(
+lazy val oathModules: Seq[ProjectReference] = Seq(
   oathMacros,
   oathCore,
   oathCirce,
   oathJsoniterScala,
 )
+
+lazy val exampleModules: Seq[ProjectReference] = Seq(example)
+
+lazy val allModules: Seq[ProjectReference] = exampleModules ++ oathModules

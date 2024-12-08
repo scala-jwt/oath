@@ -95,11 +95,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: mkdir -p modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target modules/oath-macros/target project/target
+        run: mkdir -p oath/circe/target oath/jsoniter-scala/target oath/core/target oath/macros/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: tar cf targets.tar modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target modules/oath-macros/target project/target
+        run: tar cf targets.tar oath/circe/target oath/jsoniter-scala/target oath/core/target oath/macros/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
@@ -252,7 +252,7 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: oath_3
+          modules-ignore: oath-root_3 example_3 oath_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:
@@ -285,7 +285,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.3.3]
+        scala: [3.3.4]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
@@ -313,7 +313,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.3.3]
+        scala: [3.3.4]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
