@@ -1,5 +1,7 @@
 package io.oath
 
-enum OathToken {
+import io.oath.macros.OathEnum
+
+enum OathToken derives OathEnum {
   case AccessToken, RefreshToken, ActivationEmailToken, ForgotPasswordToken
 }

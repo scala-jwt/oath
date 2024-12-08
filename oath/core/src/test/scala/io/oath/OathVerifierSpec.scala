@@ -1,9 +1,11 @@
 package io.oath
 
+import io.oath.OathIssuer.JIssuer
+import io.oath.OathVerifier.JVerifier
 import io.oath.syntax.all.*
-import io.oath.test.*
+import io.oath.testkit.WordSpecBase
 
-class OathVerifierSpec extends AnyWordSpecBase {
+class OathVerifierSpec extends WordSpecBase {
 
   val oathIssuer = OathIssuer.createOrFail[OathToken]
 

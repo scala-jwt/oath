@@ -8,27 +8,26 @@ import io.oath.config.JwtVerifierConfig.*
 import io.oath.config.{JwtIssuerConfig, JwtVerifierConfig}
 import io.oath.json.ClaimsDecoder
 import io.oath.syntax.*
-import io.oath.testkit.AnyWordSpecBase
-import io.oath.utils.CodecUtils
+import io.oath.syntax.all.*
+import io.oath.testkit.CodecHelper.unsafeParseJsonToJavaMap
+import io.oath.testkit.WordSpecBase
 
-class JsoniterConversionSpec extends AnyWordSpecBase, CodecUtils {
+class JsoniterConversionSpec extends WordSpecBase {
 
   val verifierConfig =
     JwtVerifierConfig(
       Algorithm.none(),
-      None,
       ProvidedWithConfig(None, None, Nil),
       LeewayWindowConfig(None, None, None, None),
     )
   val issuerConfig =
     JwtIssuerConfig(
       Algorithm.none(),
-      None,
       RegisteredConfig(None, None, Nil, includeJwtIdClaim = false, includeIssueAtClaim = false, None, None),
     )
 
-  val jwtVerifier = new JwtVerifierSpec(verifierConfig)
-  val jwtIssuer   = new JwtIssuer(issuerConfig)
+  val jwtVerifier = JwtVerifier(verifierConfig)
+  val jwtIssuer   = JwtIssuer(issuerConfig)
 
   "JsoniterConversion" should {
 

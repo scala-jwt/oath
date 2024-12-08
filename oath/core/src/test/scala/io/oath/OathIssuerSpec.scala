@@ -1,9 +1,9 @@
 package io.oath
 
 import io.oath.OathIssuer.JIssuer
-import io.oath.testkit.AnyWordSpecBase
+import io.oath.testkit.WordSpecBase
 
-class OathIssuerSpec extends AnyWordSpecBase {
+class OathIssuerSpec extends WordSpecBase {
 
   "OathIssuer" should {
     "create jwt token issuers" in {

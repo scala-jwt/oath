@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import com.typesafe.config.ConfigFactory
 import io.oath.testkit.*
 
-class AlgorithmLoaderSpec extends AnyWordSpecBase, PropertyBasedTesting {
+class AlgorithmLoaderSpec extends WordSpecBase, PropertyBasedTesting {
   val AlgorithmConfigLocation = "algorithm"
 
   "AlgorithmLoader" should {

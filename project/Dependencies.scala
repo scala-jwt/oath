@@ -8,8 +8,8 @@ object Dependencies {
   private lazy val javaJWTV            = "4.4.0"
   private lazy val configV             = "1.4.3"
   private lazy val bcprovV             = "1.78.1"
-  private lazy val circeV              = "0.14.7"
-  private lazy val jsoniterScalaV      = "2.27.3"
+  private lazy val circeV              = "0.14.9"
+  private lazy val jsoniterScalaV      = "2.30.7"
   private lazy val catsV               = "2.12.0"
   private lazy val tinkV               = "1.14.1"
 

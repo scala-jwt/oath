@@ -12,7 +12,7 @@ import io.oath.testkit.*
 
 import scala.util.chaining.scalaUtilChainingOps
 
-class JwtVerifierSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
+class JwtVerifierSpec extends WordSpecBase, PropertyBasedTesting, ClockHelper {
 
   val defaultConfig =
     JwtVerifierConfig(

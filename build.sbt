@@ -107,24 +107,10 @@ lazy val oathCore = createOathModule(Some("core"))
     )
   )
 
-lazy val oathCoreTest = createOathModule(Some("core-test"))
-  .enablePlugins(NoPublishPlugin)
-  .dependsOn(oathCore)
-  .settings(
-    libraryDependencies ++= Seq(
-      Dependencies.scalaTest,
-      Dependencies.scalaTestPlusScalaCheck,
-      Dependencies.scalacheck,
-      Dependencies.circeCore,
-      Dependencies.circeGeneric,
-      Dependencies.circeParser,
-    )
-  )
-
 lazy val oathCirce = createOathModule(Some("circe"))
   .dependsOn(
     oathCore,
-    oathCoreTest % Test,
+    oathCore % "test->test",
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -137,7 +123,7 @@ lazy val oathCirce = createOathModule(Some("circe"))
 lazy val oathJsoniterScala = createOathModule(Some("jsoniter-scala"))
   .dependsOn(
     oathCore,
-    oathCoreTest % Test,
+    oathCore % "test->test",
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -149,7 +135,6 @@ lazy val oathJsoniterScala = createOathModule(Some("jsoniter-scala"))
 lazy val oathModules: Seq[ProjectReference] = Seq(
   oathMacros,
   oathCore,
-  oathCoreTest,
   oathCirce,
   oathJsoniterScala,
 )

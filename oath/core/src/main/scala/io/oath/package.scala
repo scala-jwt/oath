@@ -1,19 +1,9 @@
 package io.oath
 
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.oath.macros.OathEnumMacro
-import io.oath.utils.Formatter
 
 import java.time.Instant
 import scala.jdk.CollectionConverters.CollectionHasAsScala
-
-// TODO: Move to a file and test it properly
-inline def getEnumValues[A](using
-    m: scala.deriving.Mirror.SumOf[A]
-): Set[(A, String)] =
-  OathEnumMacro
-    .enumValues[A]
-    .map(value => value -> Formatter.convertUpperCamelToLowerHyphen(value.toString))
 
 // TODO: Move to file
 extension (decodedJWT: DecodedJWT) {

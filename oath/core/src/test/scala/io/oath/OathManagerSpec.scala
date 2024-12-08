@@ -1,9 +1,10 @@
 package io.oath
 
+import io.oath.OathManager.JManager
 import io.oath.syntax.all.*
-import io.oath.test.*
+import io.oath.testkit.WordSpecBase
 
-class OathManagerSpec extends AnyWordSpecBase {
+class OathManagerSpec extends WordSpecBase {
 
   "OathManager" should {
     "create different token managers" in {

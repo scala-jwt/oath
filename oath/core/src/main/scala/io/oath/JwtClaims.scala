@@ -1,6 +1,6 @@
 package io.oath
 
-sealed trait JwtClaims {
+sealed abstract class JwtClaims {
   val registered: RegisteredClaims
 }
 

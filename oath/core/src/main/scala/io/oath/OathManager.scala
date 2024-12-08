@@ -2,6 +2,7 @@ package io.oath
 
 import io.oath.OathManager.JManager
 import io.oath.config.*
+import io.oath.macros.OathEnum
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -17,19 +18,15 @@ object OathManager {
     def as[S <: A](tokenType: S): JManager[S] = mapping(tokenType)
   }
 
-  def none[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathManager[A] =
-    getEnumValues[A].map { case (tokenType, _) =>
+  def none[E: OathEnum]: OathManager[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, _) =>
       tokenType -> JwtManager(JwtManagerConfig.none())
-    }.toMap
-      .pipe(mapping => new JavaJwtOathManager(mapping))
+    }.pipe(mapping => new JavaJwtOathManager(mapping))
 
-  def createOrFail[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathManager[A] =
-    getEnumValues[A].map { case (tokenType, tokenConfig) =>
-      tokenType -> JwtManagerConfig.loadOrThrowOath(tokenConfig).pipe(JwtManager(_))
-    }.toMap
-      .pipe(mapping => new JavaJwtOathManager(mapping))
+  def createOrFail[E: OathEnum]: OathManager[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, tokenConfig) =>
+      tokenType -> JwtManagerConfig
+        .loadOrThrowOath(tokenConfig)
+        .pipe(JwtManager(_))
+    }.pipe(mapping => new JavaJwtOathManager(mapping))
 }

@@ -5,7 +5,7 @@ import io.oath.testkit.*
 
 import scala.concurrent.duration.DurationInt
 
-class JwtIssuerLoaderSpec extends AnyWordSpecBase {
+class JwtIssuerLoaderSpec extends WordSpecBase {
 
   val configFile                            = "issuer"
   val DefaultTokenConfigLocation            = "default-token"

@@ -5,7 +5,7 @@ import io.oath.testkit.*
 
 import scala.concurrent.duration.DurationInt
 
-class JwtManagerLoaderSpec extends AnyWordSpecBase {
+class JwtManagerLoaderSpec extends WordSpecBase {
 
   val configFile          = "manager"
   val TokenConfigLocation = "token"

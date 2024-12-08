@@ -2,6 +2,7 @@ package io.oath
 
 import io.oath.OathVerifier.JVerifier
 import io.oath.config.*
+import io.oath.macros.OathEnum
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -18,19 +19,15 @@ object OathVerifier {
     def as[S <: A](tokenType: S): JVerifier[S] = mapping(tokenType)
   }
 
-  def none[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathVerifier[A] =
-    getEnumValues[A].map { case (tokenType, _) =>
+  def none[E: OathEnum]: OathVerifier[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, _) =>
       tokenType -> JwtVerifier(JwtVerifierConfig.none())
-    }.toMap
-      .pipe(mapping => new JavaJwtOathVerifier(mapping))
+    }.pipe(mapping => new JavaJwtOathVerifier(mapping))
 
-  def createOrFail[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathVerifier[A] =
-    getEnumValues[A].map { case (tokenType, tokenConfig) =>
-      tokenType -> JwtVerifierConfig.loadOrThrowOath(tokenConfig).pipe(JwtVerifier(_))
-    }.toMap
-      .pipe(mapping => new JavaJwtOathVerifier(mapping))
+  def createOrFail[E: OathEnum]: OathVerifier[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, tokenConfig) =>
+      tokenType -> JwtVerifierConfig
+        .loadOrThrowOath(tokenConfig)
+        .pipe(JwtVerifier(_))
+    }.pipe(mapping => new JavaJwtOathVerifier(mapping))
 }

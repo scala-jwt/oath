@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.Try
 import scala.util.chaining.*
 
-class JwtIssuerSpec extends AnyWordSpecBase, PropertyBasedTesting, ClockHelper {
+class JwtIssuerSpec extends WordSpecBase, PropertyBasedTesting, ClockHelper {
 
   val jwtVerifier = JWT
     .require(Algorithm.none())

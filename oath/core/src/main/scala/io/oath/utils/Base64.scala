@@ -8,7 +8,6 @@ import scala.util.control.Exception.allCatch
 
 private[oath] object Base64 {
 
-  // TODO: not tested
   def decodeToken(token: String): Either[JwtVerifyError.DecodingError, String] =
     allCatch
       .withTry(new String(JBase64.getUrlDecoder.decode(token), StandardCharsets.UTF_8))

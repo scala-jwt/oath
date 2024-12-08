@@ -2,6 +2,7 @@ package io.oath
 
 import io.oath.OathIssuer.JIssuer
 import io.oath.config.JwtIssuerConfig
+import io.oath.macros.OathEnum
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -17,19 +18,13 @@ object OathIssuer {
     def as[S <: A](tokenType: S): JIssuer[S] = mapping(tokenType)
   }
 
-  def none[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathIssuer[A] =
-    getEnumValues[A].map { case (tokenType, _) =>
+  def none[E: OathEnum]: OathIssuer[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, _) =>
       tokenType -> JwtIssuer(JwtIssuerConfig.none())
-    }.toMap
-      .pipe(mapping => new JavaJwtOathIssuer(mapping))
+    }.pipe(mapping => new JavaJwtOathIssuer(mapping))
 
-  def createOrFail[A](using
-      m: scala.deriving.Mirror.SumOf[A]
-  ): OathIssuer[A] =
-    getEnumValues[A].map { case (tokenType, tokenConfig) =>
+  def createOrFail[E: OathEnum]: OathIssuer[E] =
+    summon[OathEnum[E]].values.map { case (tokenType, tokenConfig) =>
       tokenType -> JwtIssuerConfig.loadOrThrowOath(tokenConfig).pipe(JwtIssuer(_))
-    }.toMap
-      .pipe(mapping => new JavaJwtOathIssuer(mapping))
+    }.pipe(mapping => new JavaJwtOathIssuer(mapping))
 }

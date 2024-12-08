@@ -4,7 +4,7 @@ import io.oath.config.*
 import io.oath.syntax.all.*
 import io.oath.testkit.*
 
-class JwtManagerSpec extends AnyWordSpecBase, PropertyBasedTesting {
+class JwtManagerSpec extends WordSpecBase, PropertyBasedTesting {
 
   "JwtManager" should {
     "be able to issue and verify jwt tokens without claims" in forAll { (config: JwtManagerConfig) =>
