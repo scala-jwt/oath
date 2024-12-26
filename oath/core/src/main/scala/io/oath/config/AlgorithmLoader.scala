@@ -28,31 +28,33 @@ object AlgorithmLoader {
       algorithmScoped: Config,
       forIssuing: Boolean,
   ): (Option[RSAPrivateKey], Option[RSAPublicKey]) =
-    if forIssuing then
+    if (forIssuing) {
       val privateKey: RSAPrivateKey = loadPrivateKey(algorithmScoped, RSAKeyFactory)
         .map(_.asInstanceOf[RSAPrivateKey])
         .fold(error => throw new IllegalArgumentException(s"Fail to load RSA Private key pem file: $error"), identity)
       (Some(privateKey), None)
-    else
+    } else {
       val publicKey: RSAPublicKey = loadPublicKey(algorithmScoped, RSAKeyFactory)
         .map(_.asInstanceOf[RSAPublicKey])
         .fold(error => throw new IllegalArgumentException(s"Fail to load RSA Public key pem file: $error"), identity)
       (None, Some(publicKey))
+    }
 
   private def loadECKeyOrThrow(
       algorithmScoped: Config,
       forIssuing: Boolean,
   ): (Option[ECPrivateKey], Option[ECPublicKey]) =
-    if forIssuing then
+    if (forIssuing) {
       val privateKey: ECPrivateKey = loadPrivateKey(algorithmScoped, ECKeyFactory)
         .map(_.asInstanceOf[ECPrivateKey])
         .fold(error => throw new IllegalArgumentException(s"Failed to load EC Private key pem file: $error"), identity)
       (Some(privateKey), None)
-    else
+    } else {
       val publicKey: ECPublicKey = loadPublicKey(algorithmScoped, ECKeyFactory)
         .map(_.asInstanceOf[ECPublicKey])
         .fold(error => throw new IllegalArgumentException(s"Failed to load EC Public key pem file: $error"), identity)
       (None, Some(publicKey))
+    }
 
   private def loadPublicKey(algorithmScoped: Config, keyFactory: KeyFactory): Either[String, PublicKey] =
     algorithmScoped

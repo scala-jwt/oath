@@ -96,7 +96,7 @@ lazy val oathCore = createOathModule(Some("core"))
       Dependencies.javaJWT,
       Dependencies.typesafeConfig,
       Dependencies.bcprov,
-      Dependencies.cats,
+      Dependencies.catsCore,
       Dependencies.tink,
       Dependencies.scalaTest               % Test,
       Dependencies.scalaTestPlusScalaCheck % Test,

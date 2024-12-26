@@ -67,7 +67,7 @@ object JwtIssuer {
         .withTry(builder.sign(algorithm))
         .toEither
         .left
-        .map(e => JwtIssueError.SignError("Signing token failed", e))
+        .map(JwtIssueError.SignError("Signing token failed"))
 
     def issueJwt(
         claims: JwtClaims.Claims = JwtClaims.Claims()

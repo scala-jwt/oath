@@ -21,7 +21,7 @@ private[oath] trait JwtBuilderOps {
         )
         .toEither
         .left
-        .map(error => JwtIssueError.EncodeError("Failed when trying to encode token", error))
+        .map(JwtIssueError.EncodeError("Failed when trying to encode token"))
 
     def safeEncodeHeader[H](claims: H)(using
         ClaimsEncoder[H]

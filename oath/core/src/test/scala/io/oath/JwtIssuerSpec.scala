@@ -181,8 +181,8 @@ class JwtIssuerSpec extends WordSpecBase, PropertyBasedTesting, ClockHelper {
           .asInstanceOf[JwtIssueError.SignError]
 
         signError.message shouldBe "Signing token failed"
-        signError.underlying shouldBe a[IllegalArgumentException]
-        signError.underlying.getMessage shouldBe "The Algorithm cannot be null."
+        signError.getCause shouldBe a[IllegalArgumentException]
+        signError.getCause.getMessage shouldBe "The Algorithm cannot be null."
     }
   }
 }
