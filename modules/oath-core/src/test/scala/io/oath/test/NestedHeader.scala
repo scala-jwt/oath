@@ -27,7 +27,6 @@ object NestedHeader:
     parse(nestedHeaderJson).left
       .map(parsingFailure => JwtVerifyError.DecodingError(parsingFailure.message, parsingFailure.underlying))
       .flatMap(
-        _.as[NestedHeader].left.map(decodingFailure =>
-          JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)
-        )
+        _.as[NestedHeader].left
+          .map(decodingFailure => JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause))
       )

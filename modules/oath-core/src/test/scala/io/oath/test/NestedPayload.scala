@@ -27,7 +27,6 @@ object NestedPayload:
     parse(nestedPayloadJson).left
       .map(parsingFailure => JwtVerifyError.DecodingError(parsingFailure.message, parsingFailure.underlying))
       .flatMap(
-        _.as[NestedPayload].left.map(decodingFailure =>
-          JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause)
-        )
+        _.as[NestedPayload].left
+          .map(decodingFailure => JwtVerifyError.DecodingError(decodingFailure.getMessage(), decodingFailure.getCause))
       )
