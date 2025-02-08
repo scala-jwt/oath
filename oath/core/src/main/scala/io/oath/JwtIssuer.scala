@@ -4,7 +4,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.{JWT, JWTCreator}
 import io.oath.config.*
 import io.oath.json.ClaimsEncoder
-import io.oath.syntax.internal.*
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
@@ -62,6 +61,34 @@ object JwtIssuer {
       )
     }
 
+    private def safeEncodeHeader[T](
+        jwtBuilder: JWTCreator.Builder,
+        claims: T,
+    )(using claimsEncoder: ClaimsEncoder[T]): Either[JwtIssueError.EncodeError, JWTCreator.Builder] =
+      allCatch
+        .withTry(
+          claimsEncoder
+            .encode(claims)
+            .pipe(jwtBuilder.withHeader)
+        )
+        .toEither
+        .left
+        .map(JwtIssueError.EncodeError("Failed when trying to encode header"))
+
+    private def safeEncodePayload[T](
+        jwtBuilder: JWTCreator.Builder,
+        claims: T,
+    )(using claimsEncoder: ClaimsEncoder[T]): Either[JwtIssueError.EncodeError, JWTCreator.Builder] =
+      allCatch
+        .withTry(
+          claimsEncoder
+            .encode(claims)
+            .pipe(jwtBuilder.withPayload)
+        )
+        .toEither
+        .left
+        .map(JwtIssueError.EncodeError("Failed when trying to encode payload"))
+
     private def safeSign(builder: JWTCreator.Builder, algorithm: Algorithm): Either[JwtIssueError, String] =
       allCatch
         .withTry(builder.sign(algorithm))
@@ -91,7 +118,7 @@ object JwtIssuer {
     ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsH[H]]] = {
       val jwtBuilder = JWT.create()
       for
-        headerBuilder <- jwtBuilder.safeEncodeHeader(claims.header)
+        headerBuilder <- safeEncodeHeader(jwtBuilder, claims.header)
         registeredClaims = setRegisteredClaims(claims.registered)
         builder          = buildJwt(headerBuilder, registeredClaims)
         token <- safeSign(builder, config.algorithm)
@@ -107,7 +134,7 @@ object JwtIssuer {
     ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsP[P]]] = {
       val jwtBuilder = JWT.create()
       for
-        payloadBuilder <- jwtBuilder.safeEncodePayload(claims.payload)
+        payloadBuilder <- safeEncodePayload(jwtBuilder, claims.payload)
         registeredClaims = setRegisteredClaims(claims.registered)
         builder          = buildJwt(payloadBuilder, registeredClaims)
         token <- safeSign(builder, config.algorithm)
@@ -122,9 +149,9 @@ object JwtIssuer {
         claims: JwtClaims.ClaimsHP[H, P]
     )(using ClaimsEncoder[H], ClaimsEncoder[P]): Either[JwtIssueError, Jwt[JwtClaims.ClaimsHP[H, P]]] = {
       val jwtBuilder = JWT.create()
-      for
-        payloadBuilder          <- jwtBuilder.safeEncodePayload(claims.payload)
-        headerAndPayloadBuilder <- payloadBuilder.safeEncodeHeader(claims.header)
+      for {
+        payloadBuilder          <- safeEncodePayload(jwtBuilder, claims.payload)
+        headerAndPayloadBuilder <- safeEncodeHeader(payloadBuilder, claims.header)
         registeredClaims = setRegisteredClaims(claims.registered)
         builder          = buildJwt(headerAndPayloadBuilder, registeredClaims)
         token <- safeSign(builder, config.algorithm)
@@ -132,7 +159,7 @@ object JwtIssuer {
           claims.copy(registered = registeredClaims),
           token,
         )
-      yield jwt
+      } yield jwt
     }
   }
 

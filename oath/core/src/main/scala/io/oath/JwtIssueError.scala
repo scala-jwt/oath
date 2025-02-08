@@ -1,7 +1,5 @@
 package io.oath
 
-import cats.syntax.all.*
-
 sealed abstract class JwtIssueError(error: String, cause: Throwable) extends Exception(error, cause)
 
 object JwtIssueError {
