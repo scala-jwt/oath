@@ -2,7 +2,7 @@ import org.typelevel.sbt.gha.Permissions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := "3.3.4"
+ThisBuild / scalaVersion := "3.3.5"
 ThisBuild / organization := "io.github.scala-jwt"
 ThisBuild / organizationName := "oath"
 ThisBuild / organizationHomepage := Some(url("https://github.com/scala-jwt/oath"))
@@ -12,7 +12,7 @@ ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
   tlGitHubDev("andrewrigas", "Andreas Rigas")
 )
-ThisBuild / tlSonatypeUseLegacyHost := false
+ThisBuild / sonatypeCredentialHost := xerial.sbt.Sonatype.sonatypeLegacy
 ThisBuild / startYear := Some(2022)
 ThisBuild / githubWorkflowPermissions := Some(Permissions.WriteAll)
 ThisBuild / githubWorkflowJavaVersions := Seq("11", "17", "21").map(JavaSpec.temurin)
