@@ -26,10 +26,10 @@ concurrency:
 
 jobs:
   build:
-    name: Build and Test
+    name: Test
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         scala: [3]
         java: [temurin@11, temurin@17, temurin@21]
     runs-on: ${{ matrix.os }}
@@ -39,6 +39,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
@@ -86,20 +89,20 @@ jobs:
         run: sbt '++ ${{ matrix.scala }}' test
 
       - name: Check binary compatibility
-        if: matrix.java == 'temurin@11' && matrix.os == 'ubuntu-latest'
+        if: matrix.java == 'temurin@11' && matrix.os == 'ubuntu-22.04'
         run: sbt '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
-        if: matrix.java == 'temurin@11' && matrix.os == 'ubuntu-latest'
+        if: matrix.java == 'temurin@11' && matrix.os == 'ubuntu-22.04'
         run: sbt '++ ${{ matrix.scala }}' doc
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: mkdir -p modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target modules/oath-macros/target project/target
+        run: mkdir -p oath/circe/target oath/jsoniter-scala/target oath/core/target oath/macros/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
-        run: tar cf targets.tar modules/oath-circe/target modules/oath-jsoniter-scala/target modules/oath-core/target modules/oath-macros/target project/target
+        run: tar cf targets.tar oath/circe/target oath/jsoniter-scala/target oath/core/target oath/macros/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
@@ -114,7 +117,7 @@ jobs:
     if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
@@ -122,6 +125,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
@@ -198,10 +204,10 @@ jobs:
 
   dependency-submission:
     name: Submit Dependencies
-    if: github.event_name != 'pull_request'
+    if: github.event.repository.fork == false && github.event_name != 'pull_request'
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
@@ -209,6 +215,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@11)
         id: setup-java-temurin-11
@@ -252,14 +261,14 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: oath_3
+          modules-ignore: oath-root_3 example_3 oath_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   validate-steward:
     name: Validate Steward Config
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
@@ -284,8 +293,8 @@ jobs:
     name: Check code style
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        scala: [3.3.3]
+        os: [ubuntu-22.04]
+        scala: [3.3.5]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
@@ -312,8 +321,8 @@ jobs:
     name: Codecov
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        scala: [3.3.3]
+        os: [ubuntu-22.04]
+        scala: [3.3.5]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
