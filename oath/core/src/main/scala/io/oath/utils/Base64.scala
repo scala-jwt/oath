@@ -3,7 +3,7 @@ package io.oath.utils
 import io.oath.JwtVerifyError
 
 import java.nio.charset.StandardCharsets
-import java.util.Base64 as JBase64
+import java.util.{Base64 => JBase64}
 import scala.util.control.Exception.allCatch
 
 private[oath] object Base64 {

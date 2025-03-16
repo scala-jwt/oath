@@ -2,13 +2,14 @@ package io.oath.jsoniter_scala
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.*
+import io.oath._
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
-import io.oath.config.JwtVerifierConfig.*
+import io.oath.config.JwtVerifierConfig._
 import io.oath.config.{JwtIssuerConfig, JwtVerifierConfig}
 import io.oath.json.ClaimsDecoder
-import io.oath.syntax.*
-import io.oath.syntax.all.*
+import io.oath.jsoniter_scala.conversion.given
+import io.oath.syntax._
+import io.oath.syntax.all._
 import io.oath.testkit.CodecHelper.unsafeParseJsonToJavaMap
 import io.oath.testkit.WordSpecBase
 
@@ -30,7 +31,6 @@ class JsoniterConversionSpec extends WordSpecBase {
   val jwtIssuer   = JwtIssuer(issuerConfig)
 
   "JsoniterConversion" should {
-
     "convert jsoniter codec to claims (encoders & decoders)" in {
       val bar    = Bar("bar", 10)
       val jwt    = jwtIssuer.issueJwt(JwtClaims.ClaimsP(bar)).value

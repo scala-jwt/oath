@@ -2,7 +2,7 @@ package io.oath.config
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.{Config, ConfigFactory}
-import io.oath.config.JwtVerifierConfig.*
+import io.oath.config.JwtVerifierConfig._
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -50,21 +50,21 @@ object JwtVerifierConfig {
   def none(): JwtVerifierConfig = JwtVerifierConfig(Algorithm.none(), ProvidedWithConfig(), LeewayWindowConfig())
 
   def loadOrThrow(config: Config): JwtVerifierConfig =
-    (for
+    (for {
       algorithmScoped <- config.getMaybeConfig(AlgorithmConfigLocation)
       algorithmConfig         = AlgorithmLoader.loadOrThrow(algorithmScoped, isIssuer = false)
       maybeVerificationScoped = config.getMaybeConfig(VerifierConfigLocation)
       maybeProvidedWithConfig =
-        for
+        for {
           verificationScoped <- maybeVerificationScoped
           providedWithScoped <- verificationScoped.getMaybeConfig(ProvidedWithConfigLocation)
-        yield loadOrdThrowProvidedWithConfig(providedWithScoped)
+        } yield loadOrdThrowProvidedWithConfig(providedWithScoped)
       maybeLeewayWindowConfig =
-        for
+        for {
           verificationScoped <- maybeVerificationScoped
           leewayWindowScoped <- verificationScoped.getMaybeConfig(LeewayWindowConfigLocation)
-        yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
-    yield JwtVerifierConfig(
+        } yield loadOrThrowLeewayWindowConfig(leewayWindowScoped)
+    } yield JwtVerifierConfig(
       algorithmConfig,
       maybeProvidedWithConfig.getOrElse(ProvidedWithConfig()),
       maybeLeewayWindowConfig.getOrElse(LeewayWindowConfig()),

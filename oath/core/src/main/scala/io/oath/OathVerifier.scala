@@ -1,7 +1,7 @@
 package io.oath
 
 import io.oath.OathVerifier.JVerifier
-import io.oath.config.*
+import io.oath.config._
 import io.oath.macros.OathEnum
 
 import scala.util.chaining.scalaUtilChainingOps

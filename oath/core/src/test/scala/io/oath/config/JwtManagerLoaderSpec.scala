@@ -1,7 +1,7 @@
 package io.oath.config
 
 import com.typesafe.config.ConfigFactory
-import io.oath.testkit.*
+import io.oath.testkit._
 
 import scala.concurrent.duration.DurationInt
 

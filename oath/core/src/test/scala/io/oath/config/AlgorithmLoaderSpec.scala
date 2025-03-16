@@ -2,7 +2,7 @@ package io.oath.config
 
 import com.auth0.jwt.JWT
 import com.typesafe.config.ConfigFactory
-import io.oath.testkit.*
+import io.oath.testkit._
 
 class AlgorithmLoaderSpec extends WordSpecBase, PropertyBasedTesting {
   val AlgorithmConfigLocation = "algorithm"

@@ -2,17 +2,17 @@ package io.oath
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.{JWT, JWTCreator}
-import io.oath.config.*
+import io.oath.config._
 import io.oath.json.ClaimsEncoder
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant}
 import java.util.UUID
-import scala.util.chaining.*
+import scala.util.chaining._
 import scala.util.control.Exception.allCatch
 
 trait JwtIssuer {
-  def issueJwt(claims: JwtClaims.Claims = JwtClaims.Claims()): Either[JwtIssueError, Jwt[JwtClaims.Claims]]
+  def issueJwt(claims: JwtClaims.Claims): Either[JwtIssueError, Jwt[JwtClaims.Claims]]
   def issueJwt[H](claims: JwtClaims.ClaimsH[H])(using
       ClaimsEncoder[H]
   ): Either[JwtIssueError, Jwt[JwtClaims.ClaimsH[H]]]

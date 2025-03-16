@@ -3,7 +3,7 @@ package io.oath
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.oath.config.JwtVerifierConfig
-import io.oath.json.*
+import io.oath.json._
 import io.oath.utils.Base64
 
 import scala.util.chaining.scalaUtilChainingOps

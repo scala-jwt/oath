@@ -2,15 +2,15 @@ package io.oath.circe
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.*
+import io.oath._
 import io.oath.circe.conversion.given
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
 import io.oath.config.JwtVerifierConfig.{LeewayWindowConfig, ProvidedWithConfig}
-import io.oath.config.*
+import io.oath.config._
 import io.oath.json.ClaimsDecoder
-import io.oath.syntax.all.*
+import io.oath.syntax.all._
 import io.oath.testkit.CodecHelper.unsafeParseJsonToJavaMap
-import io.oath.testkit.*
+import io.oath.testkit._
 import org.typelevel.jawn.ParseException
 
 class CirceConversionSpec extends WordSpecBase {

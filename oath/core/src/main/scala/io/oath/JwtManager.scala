@@ -1,6 +1,6 @@
 package io.oath
 
-import io.oath.config.*
+import io.oath.config._
 import io.oath.json.{ClaimsDecoder, ClaimsEncoder}
 
 import java.time.Clock

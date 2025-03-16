@@ -2,15 +2,15 @@ package io.oath
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.config.*
-import io.oath.syntax.all.*
-import io.oath.testkit.*
-import io.oath.utils.*
+import io.oath.config._
+import io.oath.syntax.all._
+import io.oath.testkit._
+import io.oath.utils._
 
-import scala.concurrent.duration.*
+import scala.concurrent.duration._
 import scala.jdk.CollectionConverters.ListHasAsScala
 import scala.util.Try
-import scala.util.chaining.*
+import scala.util.chaining._
 
 class JwtIssuerSpec extends WordSpecBase, PropertyBasedTesting, ClockHelper {
 

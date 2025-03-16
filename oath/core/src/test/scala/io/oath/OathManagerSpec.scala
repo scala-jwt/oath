@@ -1,7 +1,7 @@
 package io.oath
 
 import io.oath.OathManager.JManager
-import io.oath.syntax.all.*
+import io.oath.syntax.all._
 import io.oath.testkit.WordSpecBase
 
 class OathManagerSpec extends WordSpecBase {

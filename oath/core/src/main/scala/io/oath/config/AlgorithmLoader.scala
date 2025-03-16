@@ -5,11 +5,11 @@ import com.typesafe.config.Config
 import org.bouncycastle.util.io.pem.PemReader
 
 import java.io.{File, FileReader}
-import java.security.interfaces.*
+import java.security.interfaces._
 import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.security.{KeyFactory, PrivateKey, PublicKey}
 import scala.util.Using
-import scala.util.chaining.*
+import scala.util.chaining._
 
 object AlgorithmLoader {
   private val SecretKeyConfigValue         = "secret-key"

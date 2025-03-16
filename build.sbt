@@ -1,4 +1,5 @@
 import org.typelevel.sbt.gha.Permissions
+//import org.typelevel.scalacoptions.ScalacOptions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 

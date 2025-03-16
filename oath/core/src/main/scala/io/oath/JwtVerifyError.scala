@@ -1,6 +1,6 @@
 package io.oath
 
-import cats.syntax.all.*
+import cats.syntax.all._
 
 sealed abstract class JwtVerifyError(error: String, cause: Option[Throwable] = None)
     extends Exception(error, cause.orNull)

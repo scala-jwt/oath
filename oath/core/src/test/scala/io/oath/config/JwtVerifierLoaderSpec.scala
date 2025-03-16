@@ -1,7 +1,7 @@
 package io.oath.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import io.oath.testkit.*
+import io.oath.testkit._
 
 import scala.concurrent.duration.DurationInt
 
@@ -13,6 +13,7 @@ class JwtVerifierLoaderSpec extends WordSpecBase {
   val WithoutPublicKeyTokenConfigLocation   = "without-public-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
+  val InvalidAudienceClaimsConfigLocation   = "invalid-seq-empty-string"
 
   "VerifierLoader" should {
     "load default-token verifier config values from configuration file" in {
@@ -73,6 +74,12 @@ class JwtVerifierLoaderSpec extends WordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
       the[ConfigException.WrongType] thrownBy JwtVerifierConfig.loadOrThrow(configLoader)
+    }
+
+    "fail to load verifier config when audience claims contain empty string in configuration file" in {
+      val configLoader = ConfigFactory.load(configFile).getConfig(InvalidAudienceClaimsConfigLocation)
+
+      the[IllegalArgumentException] thrownBy JwtVerifierConfig.loadOrThrow(configLoader)
     }
   }
 }

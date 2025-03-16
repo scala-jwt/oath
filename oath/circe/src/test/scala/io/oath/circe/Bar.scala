@@ -1,6 +1,6 @@
 package io.oath.circe
 
-import io.circe.generic.semiauto.*
+import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 
 final case class Bar(name: String, age: Int)

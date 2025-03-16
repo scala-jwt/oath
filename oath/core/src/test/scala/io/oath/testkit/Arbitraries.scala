@@ -1,13 +1,13 @@
 package io.oath.testkit
 
 import com.auth0.jwt.algorithms.Algorithm
-import io.oath.NestedHeader.*
-import io.oath.NestedPayload.*
-import io.oath.*
+import io.oath.NestedHeader._
+import io.oath.NestedPayload._
+import io.oath._
 import io.oath.config.JwtIssuerConfig.RegisteredConfig
-import io.oath.config.JwtVerifierConfig.*
-import io.oath.config.*
-import org.scalacheck.*
+import io.oath.config.JwtVerifierConfig._
+import io.oath.config._
+import org.scalacheck._
 
 import java.time.Instant
 import scala.concurrent.duration.{Duration, DurationInt}

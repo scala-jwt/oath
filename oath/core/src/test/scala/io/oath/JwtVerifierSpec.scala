@@ -1,14 +1,14 @@
 package io.oath
 
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.*
+import com.auth0.jwt.exceptions._
 import com.auth0.jwt.{JWT, JWTCreator}
 import io.oath.NestedHeader.SimpleHeader
 import io.oath.NestedPayload.SimplePayload
 import io.oath.config.JwtVerifierConfig
-import io.oath.config.JwtVerifierConfig.*
-import io.oath.syntax.all.*
-import io.oath.testkit.*
+import io.oath.config.JwtVerifierConfig._
+import io.oath.syntax.all._
+import io.oath.testkit._
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -50,7 +50,7 @@ class JwtVerifierSpec extends WordSpecBase, PropertyBasedTesting, ClockHelper {
   }
 
   "JwtVerifier" when {
-    "verifyJwt Token" should {
+    "verifyJwt" should {
       "verify token with prerequisite configurations" in forAll { (config: JwtVerifierConfig) =>
         val jwtVerifier = JwtVerifier(config)
         val testData    = setRegisteredClaims(JWT.create(), config)

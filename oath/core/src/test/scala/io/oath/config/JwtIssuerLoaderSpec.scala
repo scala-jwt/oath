@@ -1,7 +1,7 @@
 package io.oath.config
 
 import com.typesafe.config.{ConfigException, ConfigFactory}
-import io.oath.testkit.*
+import io.oath.testkit._
 
 import scala.concurrent.duration.DurationInt
 
@@ -13,6 +13,7 @@ class JwtIssuerLoaderSpec extends WordSpecBase {
   val WithoutPrivateKeyTokenConfigLocation  = "without-private-key-token"
   val InvalidTokenEmptyStringConfigLocation = "invalid-token-empty-string"
   val InvalidTokenWrongTypeConfigLocation   = "invalid-token-wrong-type"
+  val InvalidAudienceClaimsConfigLocation   = "invalid-seq-empty-string"
 
   "IssuerLoader" should {
     "load default-token issuer config values from configuration file" in {
@@ -72,6 +73,12 @@ class JwtIssuerLoaderSpec extends WordSpecBase {
       val configLoader = ConfigFactory.load(configFile).getConfig(InvalidTokenWrongTypeConfigLocation)
 
       the[ConfigException.BadValue] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
+    }
+
+    "fail to load issuer config when audience claims contain empty string in configuration file" in {
+      val configLoader = ConfigFactory.load(configFile).getConfig(InvalidAudienceClaimsConfigLocation)
+
+      the[IllegalArgumentException] thrownBy JwtIssuerConfig.loadOrThrow(configLoader)
     }
   }
 }

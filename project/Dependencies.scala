@@ -5,13 +5,13 @@ object Dependencies {
   private lazy val scalaTestV          = "3.2.19"
   private lazy val scalaTestPlusCheckV = "3.2.18.0"
   private lazy val scalacheckV         = "1.18.1"
-  private lazy val javaJWTV            = "4.4.0"
+  private lazy val javaJWTV            = "4.5.0"
   private lazy val configV             = "1.4.3"
-  private lazy val bcprovV             = "1.79"
+  private lazy val bcprovV             = "1.80"
   private lazy val circeV              = "0.14.10"
-  private lazy val jsoniterScalaV      = "2.31.3"
-  private lazy val catsV               = "2.12.0"
-  private lazy val tinkV               = "1.15.0"
+  private lazy val jsoniterScalaV      = "2.33.1"
+  private lazy val catsV               = "2.13.0"
+  private lazy val tinkV               = "1.16.0"
 
   // Testing
   lazy val scalaTest               = "org.scalatest"     %% "scalatest"       % scalaTestV

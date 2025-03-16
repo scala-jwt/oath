@@ -2,7 +2,7 @@ package io.oath
 
 import io.oath.OathIssuer.JIssuer
 import io.oath.OathVerifier.JVerifier
-import io.oath.syntax.all.*
+import io.oath.syntax.all._
 import io.oath.testkit.WordSpecBase
 
 class OathVerifierSpec extends WordSpecBase {

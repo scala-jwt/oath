@@ -3,9 +3,9 @@ package io.oath.config
 import com.typesafe.config.{Config, ConfigException, ConfigFactory}
 
 import scala.concurrent.duration.FiniteDuration
-import scala.jdk.CollectionConverters.*
-import scala.jdk.DurationConverters.*
-import scala.util.chaining.*
+import scala.jdk.CollectionConverters._
+import scala.jdk.DurationConverters._
+import scala.util.chaining._
 import scala.util.control.Exception.allCatch
 
 private[config] val OathLocation = "oath"
